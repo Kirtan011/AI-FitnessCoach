@@ -71,18 +71,10 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
           <Button
             onClick={onGetStarted}
             size="lg"
-            className="h-14 gap-3 hover:cursor-pointer  rounded-full px-8 text-base font-semibold shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 transition-all duration-300 hover:scale-[1.02]"
+            className="h-14 gap-3 hover:cursor-pointer  rounded-lg px-8 text-base font-semibold shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 transition-all duration-300 hover:scale-[1.02]"
           >
             <ZapIcon className="h-5 w-5 " />
-            Proceed Your Journey
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="h-14 gap-2 rounded-full px-8 text-base font-medium bg-secondary hover:cursor-pointer !hover:bg-secondary/80"
-          >
-            <SparklesIcon className="h-5 w-5" />
-            How it Works
+            Proceed Your Fitness Journey
           </Button>
         </div>
       </div>

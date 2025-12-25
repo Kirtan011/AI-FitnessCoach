@@ -1,44 +1,22 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
 import { MoonIcon, SunIcon } from "@/components/icons";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
-
   return (
-    <button
-      onClick={toggleTheme}
-      className="relative flex h-8 w-16 items-center rounded-full border border-border bg-muted px-1 transition-all hover:bg-muted/80"
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className="rounded-full"
     >
-      {/* Sliding pill */}
-      <div
-        className={`absolute h-6 w-6 rounded-full bg-background shadow-md transition-all duration-300 ${
-          theme === "dark" ? "translate-x-8" : "translate-x-0"
-        }`}
-      />
-
-      {/* Sun */}
-      <div className="flex h-6 w-6 items-center justify-center">
-        <SunIcon
-          className={`h-4 w-4 transition ${
-            theme === "dark" ? "opacity-40" : "opacity-100 text-amber-500"
-          }`}
-        />
-      </div>
-
-      {/* Moon */}
-      <div className="flex h-6 w-6 items-center justify-center ml-auto">
-        <MoonIcon
-          className={`h-4 w-4 transition ${
-            theme === "dark" ? "opacity-100 text-blue-400" : "opacity-40"
-          }`}
-        />
-      </div>
-    </button>
+      <SunIcon className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <MoonIcon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <span className="sr-only">Toggle theme</span>
+    </Button>
   );
 }
