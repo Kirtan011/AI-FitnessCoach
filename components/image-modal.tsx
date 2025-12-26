@@ -29,7 +29,6 @@ export function ImageModal({
           ? `${itemName} exercise, fitness, gym, person working out, professional photography, high quality`
           : `${itemName}, delicious healthy food, professional food photography, high quality, appetizing`;
 
-      // Pollinations.ai free API
       const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(
         prompt
       )}?width=512&height=512&nologo=true`;
