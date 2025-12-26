@@ -2,15 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  DumbbellIcon,
-  SparklesIcon,
-  SaladIcon,
-  ZapIcon,
-  ChevronRightIcon,
-  RefreshIcon,
-} from "@/components/icons";
-import { cn } from "@/lib/utils";
+import { ZapIcon } from "@/components/icons";
 
 interface HeroSectionProps {
   onGetStarted: () => void;

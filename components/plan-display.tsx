@@ -43,34 +43,36 @@ export function PlanDisplay({
   } | null>(null);
 
   const speakPlan = (section: "workout" | "diet") => {
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      let text = "";
-      if (section === "workout") {
-        text = `Here's your workout plan. ${plan.workoutPlan
-          .map(
-            (day) =>
-              `${day.day}: ${day.focus}. ${day.exercises
-                .map((e) => `${e.name}, ${e.sets} sets of ${e.reps}`)
-                .join(". ")}`
-          )
-          .join(". ")}`;
-      } else {
-        text = `Here's your diet plan. Breakfast: ${plan.dietPlan.breakfast.name}. Lunch: ${plan.dietPlan.lunch.name}. Dinner: ${plan.dietPlan.dinner.name}. Total calories: ${plan.dietPlan.totalCalories}.`;
-      }
+    if (!("speechSynthesis" in window)) return;
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.onstart = () => {
-        setIsSpeaking(true);
-        setSpeakingSection(section);
-      };
-      utterance.onend = () => {
-        setIsSpeaking(false);
-        setSpeakingSection(null);
-      };
-      window.speechSynthesis.speak(utterance);
+    window.speechSynthesis.cancel();
+    let text = "";
+
+    if (section === "workout") {
+      text = `Here is your workout plan. ${plan.workoutPlan
+        .map(
+          (day) =>
+            `${day.day}: ${day.focus}. ${day.exercises
+              .map((e) => `${e.name}, ${e.sets} sets of ${e.reps}`)
+              .join(". ")}`
+        )
+        .join(". ")}`;
+    } else {
+      text = `Here is your diet plan. Breakfast: ${plan.dietPlan.breakfast.name}. Lunch: ${plan.dietPlan.lunch.name}. Dinner: ${plan.dietPlan.dinner.name}. Total calories ${plan.dietPlan.totalCalories}`;
     }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.9;
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+      setSpeakingSection(section);
+    };
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setSpeakingSection(null);
+    };
+
+    window.speechSynthesis.speak(utterance);
   };
 
   const stopSpeaking = () => {
@@ -80,7 +82,7 @@ export function PlanDisplay({
   };
 
   const exportToPDF = () => {
-    const content = `FitBeat - Plan for ${userProfile.name}...`; // Simplified for brevity
+    const content = `FitBeat - Plan for ${userProfile.name}`;
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -95,43 +97,31 @@ export function PlanDisplay({
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-20">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-            <SparklesIcon className="h-3 w-3" />
-            AI Generated Plan
-          </div>
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight">
-            Ready to{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-              Crush it,
-            </span>{" "}
-            {userProfile.name}?
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-md">
-            Your custom blueprint for{" "}
-            <span className="text-foreground font-semibold underline decoration-accent/30">
-              {userProfile.fitnessGoal.replace("-", " ")}
-            </span>
-            .
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            onClick={exportToPDF}
-            className="rounded-2xl border-2 border-border hover:bg-secondary"
-          >
+    <div className="max-w-5xl mx-auto space-y-8 pb-16 px-4">
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <p className="text-sm text-primary font-semibold uppercase">
+          AI Generated Plan
+        </p>
+
+        <h2 className="text-3xl font-bold">
+          Hi {userProfile.name}, here’s your plan 🎯
+        </h2>
+
+        <p className="text-muted-foreground">
+          Goal:{" "}
+          <span className="font-semibold">
+            {userProfile.fitnessGoal.replace("-", " ")}
+          </span>
+        </p>
+
+        <div className="flex gap-3 justify-center mt-3">
+          <Button variant="outline" onClick={exportToPDF}>
             <DownloadIcon className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Button
-            onClick={onRegenerate}
-            disabled={isLoading}
-            className="rounded-2xl bg-primary shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300"
-          >
+
+          <Button onClick={onRegenerate} disabled={isLoading}>
             <RefreshIcon
               className={cn("h-4 w-4 mr-2", isLoading && "animate-spin")}
             />
@@ -140,225 +130,144 @@ export function PlanDisplay({
         </div>
       </div>
 
-      <Tabs defaultValue="workout" className="w-full">
-        <div className="px-4 mb-8">
-          <TabsList className="w-full max-w-2xl mx-auto grid grid-cols-3 h-16 p-2 rounded-2xl bg-secondary/50 backdrop-blur-md border border-border/50">
-            <TabsTrigger
-              value="workout"
-              className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2 text-base"
-            >
-              <DumbbellIcon className="h-5 w-5" /> Workout
-            </TabsTrigger>
-            <TabsTrigger
-              value="diet"
-              className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2 text-base"
-            >
-              <SaladIcon className="h-5 w-5" /> Nutrition
-            </TabsTrigger>
-            <TabsTrigger
-              value="tips"
-              className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2 text-base"
-            >
-              <SparklesIcon className="h-5 w-5" /> Insights
-            </TabsTrigger>
-          </TabsList>
-        </div>
+      {/* Tabs */}
+      <Tabs defaultValue="workout">
+        <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto">
+          <TabsTrigger value="workout" className="gap-2">
+            <DumbbellIcon className="h-4 w-4" /> Workout
+          </TabsTrigger>
 
-        {/* Workout Content */}
-        <TabsContent value="workout" className="space-y-8 px-4 outline-none">
-          <div className="flex items-center justify-between bg-accent/5 p-4 rounded-2xl border border-accent/10">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-accent/20 rounded-xl text-accent">
-                <ClockIcon className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="font-bold">Weekly Schedule</p>
-                <p className="text-sm text-muted-foreground">
-                  7 Days of personalized training
-                </p>
-              </div>
-            </div>
+          <TabsTrigger value="diet" className="gap-2">
+            <SaladIcon className="h-4 w-4" /> Diet
+          </TabsTrigger>
+
+          <TabsTrigger value="tips" className="gap-2">
+            <SparklesIcon className="h-4 w-4" /> Tips
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Workout */}
+        {/* Workout */}
+        <TabsContent value="workout" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <DumbbellIcon className="h-5 w-5" /> Workout Plan
+            </h3>
+
             <Button
-              variant="secondary"
               size="sm"
+              variant="secondary"
               onClick={() =>
                 isSpeaking && speakingSection === "workout"
                   ? stopSpeaking()
                   : speakPlan("workout")
               }
-              className="rounded-xl gap-2 font-semibold"
             >
-              <VolumeIcon
-                className={cn("h-4 w-4", isSpeaking && "animate-pulse")}
-              />
-              {isSpeaking && speakingSection === "workout"
-                ? "Stop Audio"
-                : "Listen to Plan"}
+              <VolumeIcon className="h-4 w-4 mr-1" />
+              {isSpeaking && speakingSection === "workout" ? "Stop" : "Listen"}
             </Button>
           </div>
 
-          <div className="grid gap-8">
-            {plan.workoutPlan.map((day, index) => (
-              <div
-                key={index}
-                className="group relative grid grid-cols-1 lg:grid-cols-[100px_1fr] gap-4"
-              >
-                <div className="hidden lg:flex flex-col items-center pt-2">
-                  <div className="text-xs font-black text-muted-foreground/50 uppercase mb-1">
-                    Day
-                  </div>
-                  <div className="text-3xl font-black text-primary/40 group-hover:text-primary transition-colors">
-                    0{index + 1}
-                  </div>
-                </div>
+          {/* GRID LAYOUT HERE */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {plan.workoutPlan.map((day, i) => (
+              <Card key={i} className="hover:shadow-md transition">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg text-red-600/60">
+                    {day.day}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">{day.focus}</p>
+                </CardHeader>
 
-                <Card className="relative overflow-hidden border-none shadow-xl shadow-black/5 bg-card/60 backdrop-blur-sm group-hover:ring-2 ring-primary/20 transition-all duration-300">
-                  <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-primary to-accent" />
-                  <CardHeader className="pb-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <CardTitle className="text-2xl font-bold flex items-center gap-3">
-                        {day.day}
-                        <span className="text-sm font-medium px-3 py-1 bg-secondary rounded-full text-muted-foreground">
-                          {day.focus}
-                        </span>
-                      </CardTitle>
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent bg-accent/10 px-3 py-1 rounded-lg">
-                          <FlameIcon className="h-3.5 w-3.5" />{" "}
-                          {day.caloriesBurned} kcal
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground bg-secondary px-3 py-1 rounded-lg">
-                          <ClockIcon className="h-3.5 w-3.5" /> {day.duration}
-                        </span>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="grid sm:grid-cols-2 gap-3">
-                    {day.exercises.map((exercise, exIndex) => (
+                <CardContent className="space-y-2">
+                  <p className="text-xs text-muted-foreground flex items-center gap-2">
+                    <ClockIcon className="h-4 w-4" /> {day.duration}
+                    <span>•</span>
+                    <FlameIcon className="h-4 w-4 text-primary" />
+                    {day.caloriesBurned} kcal
+                  </p>
+
+                  <div className="space-y-2">
+                    {day.exercises.map((ex, idx) => (
                       <button
-                        key={exIndex}
+                        key={idx}
                         onClick={() =>
-                          setSelectedItem({
-                            type: "exercise",
-                            name: exercise.name,
-                          })
+                          setSelectedItem({ type: "exercise", name: ex.name })
                         }
-                        className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/30 border border-transparent hover:border-primary/20 hover:bg-background transition-all group/item text-left"
+                        className="w-full text-left px-3 py-2 border rounded-lg hover:bg-accent/10 transition text-xs"
                       >
-                        <div className="h-10 w-10 shrink-0 rounded-full bg-background flex items-center justify-center font-bold text-xs border border-border group-hover/item:bg-primary group-hover/item:text-primary-foreground transition-colors">
-                          {exIndex + 1}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold truncate group-hover/item:text-primary transition-colors">
-                            {exercise.name}
-                          </p>
-                          <p className="text-xs text-muted-foreground font-medium">
-                            {exercise.sets} Sets • {exercise.reps} Reps •{" "}
-                            {exercise.restTime} Rest
-                          </p>
-                        </div>
+                        <span className="font-semibold">{ex.name}</span>
+                        <br />
+                        <span className="text-muted-foreground">
+                          {ex.sets} Sets • {ex.reps} Reps
+                        </span>
                       </button>
                     ))}
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </TabsContent>
 
-        {/* Nutrition Content */}
-        <TabsContent value="diet" className="space-y-8 px-4 outline-none">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="col-span-full md:col-span-1 border-none bg-primary text-primary-foreground overflow-hidden">
-              <div className="absolute top-0 right-0 p-8 opacity-10">
-                <FlameIcon className="h-32 w-32" />
-              </div>
-              <CardContent className="p-8 relative">
-                <p className="text-primary-foreground/80 font-medium mb-1">
-                  Target Intake
-                </p>
-                <h3 className="text-5xl font-black mb-6">
-                  {plan.dietPlan.totalCalories}{" "}
-                  <span className="text-xl opacity-70">kcal</span>
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center text-sm font-bold border-b border-primary-foreground/20 pb-2">
-                    <span>Daily Goal</span>
-                    <CheckIcon className="h-4 w-4" />
-                  </div>
-                  <p className="text-sm opacity-80 leading-relaxed">
-                    Optimized macronutrients based on your activity levels and
-                    metabolic rate.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Diet */}
+        <TabsContent value="diet" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex gap-2 items-center">
+                <FlameIcon className="h-5 w-5 text-primary" />
+                Daily Calories: {plan.dietPlan.totalCalories}
+              </CardTitle>
+            </CardHeader>
 
-            <div className="md:col-span-2 space-y-4">
-              {/* Simplified Meal Row */}
+            <CardContent className="space-y-3">
               {[
-                {
-                  label: "Breakfast",
-                  meal: plan.dietPlan.breakfast,
-                  emoji: "🍳",
-                },
-                { label: "Lunch", meal: plan.dietPlan.lunch, emoji: "🍱" },
-                { label: "Dinner", meal: plan.dietPlan.dinner, emoji: "🥗" },
-              ].map(({ label, meal, emoji }, i) => (
+                { label: "Breakfast", meal: plan.dietPlan.breakfast },
+                { label: "Lunch", meal: plan.dietPlan.lunch },
+                { label: "Dinner", meal: plan.dietPlan.dinner },
+              ].map((m, i) => (
                 <button
                   key={i}
                   onClick={() =>
-                    setSelectedItem({ type: "meal", name: meal.name })
+                    setSelectedItem({ type: "meal", name: m.meal.name })
                   }
-                  className="w-full flex items-center gap-6 p-5 rounded-3xl bg-card border border-border/50 hover:shadow-lg transition-all text-left"
+                  className="w-full flex justify-between items-center p-3 border rounded-lg hover:bg-accent/10 transition"
                 >
-                  <span className="text-4xl">{emoji}</span>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-black uppercase text-primary tracking-widest">
-                        {label}
-                      </span>
-                      <span className="text-xs font-bold text-muted-foreground">
-                        {meal.calories} kcal
-                      </span>
-                    </div>
-                    <h4 className="font-bold text-lg">{meal.name}</h4>
-                    <p className="text-sm text-muted-foreground line-clamp-1">
-                      {meal.description}
-                    </p>
-                  </div>
+                  <span className="font-semibold">{m.label}</span>
+                  <span>{m.meal.name}</span>
                 </button>
               ))}
-            </div>
-          </div>
+
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  isSpeaking && speakingSection === "diet"
+                    ? stopSpeaking()
+                    : speakPlan("diet")
+                }
+              >
+                <VolumeIcon className="h-4 w-4 mr-2" />
+                {isSpeaking && speakingSection === "diet" ? "Stop" : "Listen"}
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        {/* Tips Content */}
-        <TabsContent value="tips" className="px-4">
-          <div className="max-w-3xl mx-auto space-y-6">
-            <div className="text-center space-y-2 mb-10">
-              <QuoteIcon className="h-8 w-8 mx-auto text-primary/40 mb-2" />
-              <p className="text-2xl italic font-medium tracking-tight">
-                "{plan.motivation}"
-              </p>
-            </div>
-
-            <div className="grid gap-4">
-              {plan.tips.map((tip, index) => (
-                <div
-                  key={index}
-                  className="group p-6 rounded-3xl bg-secondary/20 border border-transparent hover:border-primary/20 hover:bg-background transition-all flex gap-5 items-start"
-                >
-                  <div className="h-10 w-10 shrink-0 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                    <CheckIcon className="h-5 w-5" />
-                  </div>
-                  <p className="text-lg font-medium leading-relaxed text-muted-foreground group-hover:text-foreground transition-colors">
-                    {tip}
-                  </p>
-                </div>
-              ))}
-            </div>
+        {/* Tips */}
+        <TabsContent value="tips" className="space-y-4">
+          <div className="text-center">
+            <QuoteIcon className="h-6 w-6 mx-auto text-primary mb-2" />
+            <p className="italic text-lg">{plan.motivation}</p>
           </div>
+
+          {plan.tips.map((tip, i) => (
+            <Card key={i}>
+              <CardContent className="flex gap-2 py-4">
+                <CheckIcon className="h-5 w-5 text-primary" />
+                <p>{tip}</p>
+              </CardContent>
+            </Card>
+          ))}
         </TabsContent>
       </Tabs>
 
