@@ -9,7 +9,7 @@ const _inter = Inter({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FitBeat - Your AI Fitness Coach",
+  title: "FitChamp - Your AI Fitness Coach",
   description: "AI-powered personalized workout and diet plans",
   generator: "Next.js",
   icons: {
@@ -41,7 +41,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >

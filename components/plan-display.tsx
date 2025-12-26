@@ -82,12 +82,12 @@ export function PlanDisplay({
   };
 
   const exportToPDF = () => {
-    const content = `FitBeat - Plan for ${userProfile.name}`;
+    const content = `FitChamp - Plan for ${userProfile.name}`;
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `FitBeat-plan-${userProfile.name
+    a.download = `FitChamp-plan-${userProfile.name
       .toLowerCase()
       .replace(/\s+/g, "-")}.txt`;
     document.body.appendChild(a);
@@ -174,7 +174,7 @@ export function PlanDisplay({
               <Card key={i} className="hover:shadow-md transition">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg text-red-600/60">
-                    {day.day}
+                    <span className="gradient-text">{day.day}</span>
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">{day.focus}</p>
                 </CardHeader>

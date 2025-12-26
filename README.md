@@ -1,6 +1,6 @@
-# FitBeat - AI-Powered Fitness Coach
+# FitChamp - AI-Powered Fitness Coach
 
-FitBeat is an intelligent fitness application that creates personalized workout routines and nutrition plans tailored to your unique goals, body type, and lifestyle. Using advanced AI technology, it delivers custom fitness plans that adapt to your preferences and needs.
+FitChamp is an intelligent fitness application that creates personalized workout routines and nutrition plans tailored to your unique goals, body type, and lifestyle. Using advanced AI technology, it delivers custom fitness plans that adapt to your preferences and needs.
 
 ## 🚀 Features
 
@@ -95,7 +95,7 @@ FitBeat is an intelligent fitness application that creates personalized workout 
 
 ## 🤖 AI Integration
 
-FitBeat uses the Pollinations.ai API to generate personalized fitness and nutrition plans. The application also includes a fallback system that generates quality plans even when the AI service is unavailable.
+FitChamp uses the Pollinations.ai API to generate personalized fitness and nutrition plans. The application also includes a fallback system that generates quality plans even when the AI service is unavailable.
 
 ## 📱 Usage
 
