@@ -9,16 +9,16 @@ import {
   DumbbellIcon,
   SaladIcon,
   SparklesIcon,
-  VolumeIcon,
   DownloadIcon,
   RefreshIcon,
-  FlameIcon,
-  ClockIcon,
-  QuoteIcon,
   CheckIcon,
+  QuoteIcon,
 } from "@/components/icons";
 import { cn } from "@/lib/utils";
-import { ImageModal } from "./image-modal";
+import { ImageModal } from "@/components/image-modal";
+import { ExerciseModal } from "@/components/exercise-modal";
+import { WorkoutTab } from "@/components/workout-tab";
+import { DietTab } from "@/components/diet-tab";
 
 interface PlanDisplayProps {
   plan: FitnessPlan;
@@ -41,7 +41,7 @@ export function PlanDisplay({
   >(null);
   const [selectedItem, setSelectedItem] = useState<{
     type: "exercise" | "meal";
-    name: string;
+    data: any;
   } | null>(null);
 
   const speakPlan = (section: "workout" | "diet") => {
@@ -155,117 +155,27 @@ export function PlanDisplay({
         </TabsList>
 
         {/* Workout */}
-        {/* Workout */}
         <TabsContent value="workout" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="flex items-center gap-2 font-display text-lg font-bold">
-              <DumbbellIcon className="h-5 w-5 text-primary" /> Workout Plan
-            </h3>
-
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() =>
-                isSpeaking && speakingSection === "workout"
-                  ? stopSpeaking()
-                  : speakPlan("workout")
-              }
-            >
-              <VolumeIcon className="h-4 w-4 mr-1" />
-              {isSpeaking && speakingSection === "workout" ? "Stop" : "Listen"}
-            </Button>
-          </div>
-
-          {/* GRID LAYOUT HERE */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {plan.workoutPlan.map((day, i) => (
-              <Card key={i} className="hover-lift gap-3">
-                <CardHeader className="pb-0">
-                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-primary">
-                    {day.day}
-                  </p>
-                  <CardTitle className="font-display text-lg">
-                    {day.focus}
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent className="space-y-3">
-                  <p className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
-                    <ClockIcon className="h-3.5 w-3.5" /> {day.duration}
-                    <span className="text-border">|</span>
-                    <FlameIcon className="h-3.5 w-3.5 text-primary" />
-                    {day.caloriesBurned} kcal
-                  </p>
-
-                  <div className="space-y-2">
-                    {day.exercises.map((ex, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() =>
-                          setSelectedItem({ type: "exercise", name: ex.name })
-                        }
-                        className="w-full rounded-md border border-border bg-secondary/30 px-3 py-2 text-left text-xs transition hover:border-primary/40 hover:bg-secondary"
-                      >
-                        <span className="font-semibold">{ex.name}</span>
-                        <br />
-                        <span className="font-mono text-muted-foreground">
-                          {ex.sets} sets · {ex.reps} reps
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <WorkoutTab
+            plan={plan}
+            isSpeaking={isSpeaking}
+            speakingSection={speakingSection}
+            onSpeak={() => speakPlan("workout")}
+            onStopSpeak={stopSpeaking}
+            onSelectItem={(type, data) => setSelectedItem({ type, data })}
+          />
         </TabsContent>
 
         {/* Diet */}
         <TabsContent value="diet" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-primary">
-                Daily target
-              </p>
-              <CardTitle className="flex items-center gap-2 font-display text-xl">
-                <FlameIcon className="h-5 w-5 text-primary" />
-                {plan.dietPlan.totalCalories} kcal
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent className="space-y-3">
-              {[
-                { label: "Breakfast", meal: plan.dietPlan.breakfast },
-                { label: "Lunch", meal: plan.dietPlan.lunch },
-                { label: "Dinner", meal: plan.dietPlan.dinner },
-              ].map((m, i) => (
-                <button
-                  key={i}
-                  onClick={() =>
-                    setSelectedItem({ type: "meal", name: m.meal.name })
-                  }
-                  className="flex w-full items-center justify-between rounded-md border border-border bg-secondary/30 p-3 transition hover:border-primary/40 hover:bg-secondary"
-                >
-                  <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
-                    {m.label}
-                  </span>
-                  <span className="font-medium">{m.meal.name}</span>
-                </button>
-              ))}
-
-              <Button
-                variant="outline"
-                onClick={() =>
-                  isSpeaking && speakingSection === "diet"
-                    ? stopSpeaking()
-                    : speakPlan("diet")
-                }
-              >
-                <VolumeIcon className="mr-2 h-4 w-4" />
-                {isSpeaking && speakingSection === "diet" ? "Stop" : "Listen"}
-              </Button>
-            </CardContent>
-          </Card>
+          <DietTab
+            plan={plan}
+            isSpeaking={isSpeaking}
+            speakingSection={speakingSection}
+            onSpeak={() => speakPlan("diet")}
+            onStopSpeak={stopSpeaking}
+            onSelectItem={(type, data) => setSelectedItem({ type, data })}
+          />
         </TabsContent>
 
         {/* Tips */}
@@ -288,14 +198,19 @@ export function PlanDisplay({
         </TabsContent>
       </Tabs>
 
-      {selectedItem && (
+      {selectedItem?.type === "meal" && (
         <ImageModal
-          isOpen={!!selectedItem}
+          isOpen={true}
           onClose={() => setSelectedItem(null)}
-          itemName={selectedItem.name}
-          itemType={selectedItem.type}
+          itemName={selectedItem.data.name}
+          itemType="meal"
         />
       )}
+      <ExerciseModal
+        exercise={selectedItem?.type === "exercise" ? selectedItem.data : null}
+        isOpen={selectedItem?.type === "exercise"}
+        onClose={() => setSelectedItem(null)}
+      />
     </div>
   );
 }
