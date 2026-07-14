@@ -119,23 +119,23 @@ export function PlanDisplay({
           </span>
         </p>
 
-        <div className="mt-3 flex justify-center gap-3">
-          {onReset && (
-            <Button variant="ghost" onClick={onReset} disabled={isLoading}>
-              New Plan
-            </Button>
-          )}
-
-          <Button variant="outline" onClick={exportToPDF}>
+        <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+          <Button 
+            className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 text-white shadow-lg" 
+            onClick={onRegenerate} 
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <RefreshIcon className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <SparklesIcon className="mr-2 h-4 w-4" />
+            )}
+            {isLoading ? "Optimizing..." : "AI Optimize Plan"}
+          </Button>
+          
+          <Button variant="outline" className="w-full sm:w-auto" onClick={exportToPDF}>
             <DownloadIcon className="mr-2 h-4 w-4" />
             Export
-          </Button>
-
-          <Button onClick={onRegenerate} disabled={isLoading}>
-            <RefreshIcon
-              className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")}
-            />
-            {isLoading ? "Regenerating…" : "Optimize Plan"}
           </Button>
         </div>
       </div>
