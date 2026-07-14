@@ -21,6 +21,7 @@ import { WorkoutTab } from "@/components/workout-tab";
 import { DietTab } from "@/components/diet-tab";
 
 interface PlanDisplayProps {
+  planId?: string | null;
   plan: FitnessPlan;
   userProfile: UserProfile;
   onRegenerate: () => void;
@@ -29,6 +30,7 @@ interface PlanDisplayProps {
 }
 
 export function PlanDisplay({
+  planId,
   plan,
   userProfile,
   onRegenerate,
@@ -157,6 +159,7 @@ export function PlanDisplay({
         {/* Workout */}
         <TabsContent value="workout" className="space-y-4">
           <WorkoutTab
+            planId={planId}
             plan={plan}
             isSpeaking={isSpeaking}
             speakingSection={speakingSection}

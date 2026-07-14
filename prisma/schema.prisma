@@ -59,28 +59,38 @@ model VerificationToken {
 }
 
 model FitnessPlan {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  profile   Json     // Stores the UserProfile fields
-  plan      Json     // Stores the generated FitnessPlan contents
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile     Json             // Stores the UserProfile fields
+  plan        Json             // Stores the generated FitnessPlan contents
+  status      String           @default("ACTIVE") // ACTIVE, ARCHIVED
+  version     Int              @default(1)
+  workoutType String           @default("HOME") // HOME, GYM
+  sessions    WorkoutSession[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }
 
 model WorkoutSession {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date        DateTime @default(now())
-  workoutName String
-  duration    Int?     // minutes
-  calories    Int?
-  notes       String?
-  completed   Boolean  @default(true)
-  records     ExerciseRecord[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                   String           @id @default(cuid())
+  userId               String
+  user                 User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fitnessPlanId        String?
+  fitnessPlan          FitnessPlan?     @relation(fields: [fitnessPlanId], references: [id], onDelete: Cascade)
+  date                 DateTime         @default(now())
+  workoutName          String
+  workoutType          String           @default("HOME") // HOME, GYM
+  duration             Int?             // minutes
+  calories             Int?
+  notes                String?
+  completed            Boolean          @default(true) // Legacy field, keeping for compatibility
+  status               String           @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED
+  completionPercentage Int              @default(0)
+  records              ExerciseRecord[]
+  feedback             UserFeedback?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
 }
 
 model ExerciseRecord {
@@ -91,6 +101,19 @@ model ExerciseRecord {
   sets             Int
   reps             String         // e.g., "10, 10, 8"
   weight           String?        // e.g., "50 lbs"
+  skipped          Boolean        @default(false)
+  notes            String?
+  createdAt        DateTime       @default(now())
+}
+
+model UserFeedback {
+  id               String         @id @default(cuid())
+  workoutSessionId String         @unique
+  workoutSession   WorkoutSession @relation(fields: [workoutSessionId], references: [id], onDelete: Cascade)
+  difficulty       String         // Easy, Moderate, Hard
+  energyLevel      Int            // 1-5
+  sorenessLevel    Int            // 1-5
+  enjoymentLevel   Int?           // 1-5
   notes            String?
   createdAt        DateTime       @default(now())
 }

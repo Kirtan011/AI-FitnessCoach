@@ -2,10 +2,13 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DumbbellIcon, VolumeIcon, FlameIcon, ClockIcon, SparklesIcon } from "@/components/icons";
+import { DumbbellIcon, VolumeIcon, FlameIcon, ClockIcon, SparklesIcon, PlayIcon } from "@/components/icons";
 import type { FitnessPlan } from "@/lib/types";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface WorkoutTabProps {
+  planId?: string | null;
   plan: FitnessPlan;
   isSpeaking: boolean;
   speakingSection: string | null;
@@ -15,6 +18,7 @@ interface WorkoutTabProps {
 }
 
 export function WorkoutTab({
+  planId,
   plan,
   isSpeaking,
   speakingSection,
@@ -22,6 +26,38 @@ export function WorkoutTab({
   onStopSpeak,
   onSelectItem,
 }: WorkoutTabProps) {
+  const router = useRouter();
+  const [startingDay, setStartingDay] = useState<string | null>(null);
+
+  const handleStartWorkout = async (day: any) => {
+    if (!planId) {
+      alert("No active plan found to start a workout from.");
+      return;
+    }
+    setStartingDay(day.day);
+    try {
+      const response = await fetch("/api/workout-session/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fitnessPlanId: planId,
+          workoutName: `${day.day} - ${day.focus}`,
+          workoutType: "HOME",
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        router.push(`/workout/${data.sessionId}`);
+      } else {
+        alert("Failed to start workout. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error starting workout.");
+    } finally {
+      setStartingDay(null);
+    }
+  };
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -81,6 +117,14 @@ export function WorkoutTab({
             </CardHeader>
 
             <CardContent className="space-y-3">
+              <Button
+                className="w-full"
+                onClick={() => handleStartWorkout(day)}
+                disabled={startingDay === day.day}
+              >
+                {startingDay === day.day ? "Starting..." : "Start Workout"}
+                <PlayIcon className="ml-2 h-4 w-4" />
+              </Button>
               <p className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
                 <ClockIcon className="h-3.5 w-3.5" /> {day.duration}
                 <span className="text-border">|</span>

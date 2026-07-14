@@ -4,11 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PlanDisplay } from "@/components/plan-display";
 import { LoadingScreen } from "@/components/loading-screen";
+import { DashboardOverview } from "@/components/dashboard-overview";
 import type { UserProfile, FitnessPlan } from "@/lib/types";
 
 export default function DashboardPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [fitnessPlan, setFitnessPlan] = useState<FitnessPlan | null>(null);
+  const [planId, setPlanId] = useState<string | null>(null);
+  const [stats, setStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const router = useRouter();
@@ -19,9 +22,16 @@ export default function DashboardPage() {
         const response = await fetch("/api/fitness-plan");
         if (response.ok) {
           const data = await response.json();
-          if (data && data.profile && data.plan) {
+          if (data && data.profile && data.plan && data.id) {
             setUserProfile(data.profile);
             setFitnessPlan(data.plan);
+            setPlanId(data.id);
+            
+            // Also fetch stats
+            fetch("/api/stats").then(res => res.json()).then(statsData => {
+              setStats(statsData);
+            }).catch(console.error);
+            
           } else {
             router.push("/onboarding");
           }
@@ -50,8 +60,9 @@ export default function DashboardPage() {
 
         if (!response.ok) throw new Error("Failed to regenerate");
 
-        const plan: FitnessPlan = await response.json();
-        setFitnessPlan(plan);
+        const planData: { id: string, plan: FitnessPlan } = await response.json();
+        setFitnessPlan(planData.plan);
+        setPlanId(planData.id);
       } catch (error) {
         console.error("Error generating plan:", error);
         alert("Failed to regenerate plan. Please try again.");
@@ -99,8 +110,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto animate-in fade-in duration-500">
+    <div className="w-full max-w-6xl mx-auto animate-in fade-in duration-500 space-y-8 pb-12">
+      <DashboardOverview stats={stats} />
+      
       <PlanDisplay
+        planId={planId}
         plan={fitnessPlan}
         userProfile={userProfile}
         onRegenerate={handleRegenerate}

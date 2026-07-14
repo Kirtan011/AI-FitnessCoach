@@ -19,6 +19,7 @@ export async function GET() {
     }
 
     return NextResponse.json({
+      id: latestPlan.id,
       profile: latestPlan.profile,
       plan: latestPlan.plan,
     })

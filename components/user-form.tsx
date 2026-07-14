@@ -17,6 +17,14 @@ import {
 } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
+import { z } from "zod";
+
+const step1Schema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").nonempty("Name is required"),
+  age: z.number({ invalid_type_error: "Age is required" }).min(13, "Must be at least 13").max(120, "Invalid age"),
+  height: z.number({ invalid_type_error: "Height is required" }).min(50, "Height must be > 50cm").max(300, "Invalid height"),
+  weight: z.number({ invalid_type_error: "Weight is required" }).min(20, "Weight must be > 20kg").max(500, "Invalid weight"),
+});
 
 interface UserFormProps {
   onSubmit: (profile: UserProfile) => void;
@@ -143,7 +151,31 @@ export function UserForm({ onSubmit, isLoading }: UserFormProps) {
     targetDuration: "45-min",
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const goToNextStep = () => {
+    // Validate Step 1
+    if (stepIndex === 1) {
+      const result = step1Schema.safeParse({
+        name: formData.name,
+        age: formData.age,
+        height: formData.height,
+        weight: formData.weight,
+      });
+
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.issues.forEach((issue) => {
+          if (issue.path[0]) {
+            fieldErrors[issue.path[0].toString()] = issue.message;
+          }
+        });
+        setErrors(fieldErrors);
+        return;
+      }
+      setErrors({});
+    }
+
     // Skip equipment step if not home workout
     if (stepIndex === 2 && formData.workoutLocation === "gym") {
       setStepIndex(4);
@@ -256,7 +288,9 @@ export function UserForm({ onSubmit, isLoading }: UserFormProps) {
                     value={formData.name || ""}
                     onChange={(e) => updateFormData({ name: e.target.value })}
                     placeholder="Your name"
+                    className={errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
                   />
+                  {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
                 </div>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div className="space-y-2">
@@ -268,7 +302,9 @@ export function UserForm({ onSubmit, isLoading }: UserFormProps) {
                         updateFormData({ age: Number(e.target.value) })
                       }
                       placeholder="e.g. 27"
+                      className={errors.age ? "border-red-500 focus-visible:ring-red-500" : ""}
                     />
+                    {errors.age && <p className="text-xs text-red-500">{errors.age}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label>Gender</Label>
@@ -296,7 +332,9 @@ export function UserForm({ onSubmit, isLoading }: UserFormProps) {
                         updateFormData({ height: Number(e.target.value) })
                       }
                       placeholder="e.g. 175"
+                      className={errors.height ? "border-red-500 focus-visible:ring-red-500" : ""}
                     />
+                    {errors.height && <p className="text-xs text-red-500">{errors.height}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label>Weight (kg)</Label>
@@ -307,7 +345,9 @@ export function UserForm({ onSubmit, isLoading }: UserFormProps) {
                         updateFormData({ weight: Number(e.target.value) })
                       }
                       placeholder="e.g. 72"
+                      className={errors.weight ? "border-red-500 focus-visible:ring-red-500" : ""}
                     />
+                    {errors.weight && <p className="text-xs text-red-500">{errors.weight}</p>}
                   </div>
                 </div>
               </div>

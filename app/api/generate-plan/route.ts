@@ -13,8 +13,25 @@ export async function POST(request: Request) {
     const profile: UserProfile = body.profile || body
     const isRegenerate: boolean = body.isRegenerate || false
 
+    let pastWorkouts = "";
+    if (session?.user?.id) {
+      const recentSessions = await prisma.workoutSession.findMany({
+        where: { userId: session.user.id, status: "COMPLETED" },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+        include: { feedback: true }
+      });
+      if (recentSessions.length > 0) {
+        pastWorkouts = recentSessions.map(s => {
+          let fb = s.feedback ? ` Difficulty: ${s.feedback.difficulty}, Energy: ${s.feedback.energyLevel}/5, Soreness: ${s.feedback.sorenessLevel}/5.` : "";
+          if (s.feedback?.notes) fb += ` Notes: ${s.feedback.notes}.`;
+          return `Workout '${s.workoutName}': Completed ${s.completionPercentage}% in ${s.duration}m.${fb}`;
+        }).join("\n");
+      }
+    }
+
     const exerciseCount = isRegenerate ? 6 : 4
-    const prompt = buildFitnessPlanPrompt(profile, exerciseCount)
+    const prompt = buildFitnessPlanPrompt(profile, exerciseCount, pastWorkouts)
 
     let plan: FitnessPlan
 
@@ -38,22 +55,24 @@ export async function POST(request: Request) {
       }
     }
 
+    let savedPlanId = null;
     if (session?.user?.id) {
       try {
-        await prisma.fitnessPlan.create({
+        const savedPlan = await prisma.fitnessPlan.create({
           data: {
             userId: session.user.id,
             profile: profile as any,
             plan: plan as any,
           },
         })
+        savedPlanId = savedPlan.id;
         console.log(`✅ Saved plan to DB for user ${session.user.id}`)
       } catch (dbError) {
         console.error("❌ Failed to save plan to database:", dbError)
       }
     }
 
-    return NextResponse.json(plan)
+    return NextResponse.json({ id: savedPlanId, ...plan })
   } catch (error) {
     console.error("Error generating plan:", error)
     return NextResponse.json({ error: "Failed to generate plan. Please try again." }, { status: 500 })

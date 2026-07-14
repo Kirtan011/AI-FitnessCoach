@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Home, Settings, Dumbbell } from "lucide-react";
+import { Calendar, Home, Settings, LineChart } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -31,6 +31,11 @@ const navigationItems = [
     title: "Workout History",
     url: "/dashboard/history",
     icon: Calendar,
+  },
+  {
+    title: "Progress Analytics",
+    url: "/dashboard/progress",
+    icon: LineChart,
   },
   {
     title: "Settings",
