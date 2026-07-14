@@ -11,6 +11,11 @@ export interface UserProfile {
   medicalHistory?: string
   stressLevel?: "low" | "medium" | "high"
   sleepHours?: number
+  equipment?: string[]
+  targetMuscles?: string[]
+  workoutSplit?: string
+  targetDuration?: string
+  injuries?: string
 }
 
 export interface Exercise {
@@ -18,6 +23,12 @@ export interface Exercise {
   sets: number
   reps: string
   restTime: string
+  instructions?: string
+  targetMuscles?: string[]
+  difficulty?: "beginner" | "intermediate" | "advanced"
+  calories?: string
+  videoUrl?: string
+  substitutions?: string[]
   notes?: string
 }
 
@@ -52,4 +63,6 @@ export interface FitnessPlan {
   dietPlan: DietDay
   tips: string[]
   motivation: string
+  warmup?: Exercise[]
+  cooldown?: Exercise[]
 }

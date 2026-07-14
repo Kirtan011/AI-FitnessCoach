@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
+import { Framed, SectionTag } from "@/components/shared";
 import type { UserProfile } from "@/lib/types";
 import {
   UserIcon,
@@ -27,6 +27,35 @@ const FORM_STEPS = [
   { id: 3, title: "Goals", icon: TargetIcon },
   { id: 4, title: "Preferences", icon: ActivityIcon },
 ];
+
+/** Selectable option chip used across every step. */
+function OptionButton({
+  active,
+  onClick,
+  children,
+  className,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "rounded-md border px-4 py-3 text-sm font-medium capitalize transition-all",
+        active
+          ? "border-primary bg-primary/10 text-primary shadow-sm"
+          : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-secondary",
+        className
+      )}
+    >
+      {children}
+    </button>
+  );
+}
 
 export function UserForm({ onSubmit, isLoading }: UserFormProps) {
   const [stepIndex, setStepIndex] = useState(1);
@@ -58,20 +87,22 @@ export function UserForm({ onSubmit, isLoading }: UserFormProps) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-10">
-      <div className="w-full">
-        <div className="flex justify-center mb-6">
-          <div className="flex items-center space-x-4">
-            {FORM_STEPS.map((step, index) => (
+    <div className="mx-auto max-w-2xl space-y-8">
+      {/* Stepper */}
+      <div>
+        <div className="flex items-center justify-center">
+          {FORM_STEPS.map((step, index) => {
+            const done = stepIndex > index + 1;
+            const current = stepIndex === index + 1;
+            return (
               <div key={step.id} className="flex items-center">
                 <div
                   className={cn(
-                    "flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300",
-                    stepIndex > index
-                      ? "bg-accent border-accent text-accent-foreground"
-                      : stepIndex === index + 1
-                      ? "bg-primary border-primary text-primary-foreground"
-                      : "border-muted-foreground/30 text-muted-foreground"
+                    "flex size-10 items-center justify-center rounded-md border transition-all duration-300",
+                    done && "border-primary bg-primary text-primary-foreground",
+                    current && "border-primary bg-primary/10 text-primary",
+                    !done && !current &&
+                      "border-border text-muted-foreground"
                   )}
                 >
                   <step.icon className="h-5 w-5" />
@@ -79,240 +110,186 @@ export function UserForm({ onSubmit, isLoading }: UserFormProps) {
                 {index < FORM_STEPS.length - 1 && (
                   <div
                     className={cn(
-                      "h-0.5 w-12 mx-2 transition-colors duration-300",
-                      stepIndex > index + 1
-                        ? "bg-accent"
-                        : "bg-muted-foreground/30"
+                      "mx-2 h-0.5 w-10 transition-colors duration-300 sm:w-14",
+                      stepIndex > index + 1 ? "bg-primary" : "bg-border"
                     )}
                   />
                 )}
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
-        <div className="text-center">
-          <h3 className="text-lg font-semibold">
+        <div className="mt-6 text-center">
+          <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-muted-foreground">
+            Step {stepIndex} / 4
+          </p>
+          <h3 className="mt-1 font-display text-lg font-bold">
             {FORM_STEPS[stepIndex - 1].title}
           </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            Step {stepIndex} of 4
-          </p>
         </div>
       </div>
 
-      <Card className="border-0 bg-gradient-to-br from-card via-card to-muted/20 dark:from-muted dark:via-muted dark:to-muted/30 shadow-xl rounded-3xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-accent/5 via-transparent to-primary/5 dark:from-accent/10 dark:to-primary/10" />
+      <Framed className="rounded-lg shadow-sm">
+        <div className="p-6 md:p-8">
+          <SectionTag
+            label={FORM_STEPS[stepIndex - 1].title}
+            index={stepIndex}
+            total={4}
+          />
 
-        <CardContent className="relative p-6 md:p-8 space-y-8">
-          {/* Step 1 */}
-          {stepIndex === 1 && (
-            <div className="space-y-8">
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold">Basic Information</h2>
-                <p className="text-muted-foreground">
-                  Tell us a little about you
-                </p>
-              </div>
-
-              <div className="grid gap-6 max-w-md mx-auto">
+          <div className="mt-8 space-y-8">
+            {/* Step 1 */}
+            {stepIndex === 1 && (
+              <div className="grid gap-6">
                 <div className="space-y-2">
                   <Label>Name</Label>
                   <Input
                     value={formData.name || ""}
                     onChange={(e) => updateFormData({ name: e.target.value })}
+                    placeholder="Your name"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="mb-2">Age</Label>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Age</Label>
                     <Input
                       type="number"
                       value={formData.age || ""}
                       onChange={(e) =>
                         updateFormData({ age: Number(e.target.value) })
                       }
+                      placeholder="e.g. 27"
                     />
                   </div>
 
-                  <div>
-                    <Label className="mb-2">Gender</Label>
+                  <div className="space-y-2">
+                    <Label>Gender</Label>
                     <div className="grid grid-cols-3 gap-2">
                       {(["male", "female", "other"] as const).map((gender) => (
-                        <button
+                        <OptionButton
                           key={gender}
+                          active={formData.gender === gender}
                           onClick={() => updateFormData({ gender })}
-                          className={cn(
-                            "rounded-md border px-3 py-2 text-sm capitalize transition-all",
-                            formData.gender === gender
-                              ? "bg-accent text-accent-foreground shadow-md"
-                              : "hover:bg-accent/10 dark:hover:bg-accent/20 hover:border-accent/50"
-                          )}
+                          className="px-2 py-2"
                         >
                           {gender}
-                        </button>
+                        </OptionButton>
                       ))}
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Step 2 */}
-          {stepIndex === 2 && (
-            <div className="space-y-8">
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold">Body Stats</h2>
-                <p className="text-muted-foreground">
-                  Helps personalize accuracy
-                </p>
-              </div>
-
-              <div className="grid gap-6 max-w-md mx-auto">
+            {/* Step 2 */}
+            {stepIndex === 2 && (
+              <div className="grid gap-6">
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="mb-2">Height (cm)</Label>
+                  <div className="space-y-2">
+                    <Label>Height (cm)</Label>
                     <Input
                       type="number"
                       value={formData.height || ""}
                       onChange={(e) =>
                         updateFormData({ height: Number(e.target.value) })
                       }
+                      placeholder="e.g. 175"
                     />
                   </div>
 
-                  <div>
-                    <Label className="mb-2">Weight (kg)</Label>
+                  <div className="space-y-2">
+                    <Label>Weight (kg)</Label>
                     <Input
                       type="number"
                       value={formData.weight || ""}
                       onChange={(e) =>
                         updateFormData({ weight: Number(e.target.value) })
                       }
+                      placeholder="e.g. 72"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <Label className="mb-2">Sleep Hours</Label>
+                <div className="space-y-2">
+                  <Label>Sleep Hours</Label>
                   <Input
                     type="number"
                     value={formData.sleepHours || ""}
                     onChange={(e) =>
-                      updateFormData({
-                        sleepHours: Number(e.target.value),
-                      })
+                      updateFormData({ sleepHours: Number(e.target.value) })
                     }
+                    placeholder="e.g. 7"
                   />
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Step 3 */}
-          {stepIndex === 3 && (
-            <div className="space-y-8">
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold">Your Goals</h2>
-                <p className="text-muted-foreground">
-                  What are you aiming for?
-                </p>
-              </div>
-
-              <div className="grid gap-6 max-w-lg mx-auto">
-                <div>
-                  <Label>Primary Goal</Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
-                    {[
-                      { id: "weight-loss", label: "Weight Loss" },
-                      { id: "muscle-gain", label: "Muscle Gain" },
-                      { id: "maintenance", label: "Maintenance" },
-                    ].map((goal) => (
-                      <button
-                        key={goal.id}
-                        onClick={() =>
-                          updateFormData({
-                            fitnessGoal: goal.id as any,
-                          })
-                        }
-                        className={cn(
-                          "rounded-lg border px-4 py-3 text-sm transition-all",
-                          formData.fitnessGoal === goal.id
-                            ? "bg-accent text-accent-foreground shadow-md"
-                            : "hover:bg-accent/10 dark:hover:bg-accent/20 hover:border-accent/50"
-                        )}
-                      >
-                        {goal.label}
-                      </button>
-                    ))}
-                  </div>
+            {/* Step 3 */}
+            {stepIndex === 3 && (
+              <div className="space-y-3">
+                <Label>Primary Goal</Label>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  {[
+                    { id: "weight-loss", label: "Weight Loss" },
+                    { id: "muscle-gain", label: "Muscle Gain" },
+                    { id: "maintenance", label: "Maintenance" },
+                  ].map((goal) => (
+                    <OptionButton
+                      key={goal.id}
+                      active={formData.fitnessGoal === goal.id}
+                      onClick={() =>
+                        updateFormData({ fitnessGoal: goal.id as any })
+                      }
+                    >
+                      {goal.label}
+                    </OptionButton>
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Step 4 */}
-          {stepIndex === 4 && (
-            <div className="space-y-8">
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold">Preferences</h2>
-                <p className="text-muted-foreground">
-                  Final personalization details
-                </p>
-              </div>
-
-              <div className="grid gap-6 max-w-lg mx-auto">
-                <div>
-                  <Label>Workout Location</Label>
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    {[
-                      { id: "home", label: "Home" },
-                      { id: "gym", label: "Gym" },
-                      { id: "outdoor", label: "Outdoor" },
-                    ].map((opt) => (
-                      <button
-                        key={opt.id}
-                        onClick={() =>
-                          updateFormData({
-                            workoutLocation: opt.id as any,
-                          })
-                        }
-                        className={cn(
-                          "rounded-lg border px-4 py-3 text-sm transition-all",
-                          formData.workoutLocation === opt.id
-                            ? "bg-accent text-accent-foreground shadow-md"
-                            : "hover:bg-accent/10 dark:hover:bg-accent/20 hover:border-accent/50"
-                        )}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
+            {/* Step 4 */}
+            {stepIndex === 4 && (
+              <div className="space-y-3">
+                <Label>Workout Location</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: "home", label: "Home" },
+                    { id: "gym", label: "Gym" },
+                    { id: "outdoor", label: "Outdoor" },
+                  ].map((opt) => (
+                    <OptionButton
+                      key={opt.id}
+                      active={formData.workoutLocation === opt.id}
+                      onClick={() =>
+                        updateFormData({ workoutLocation: opt.id as any })
+                      }
+                    >
+                      {opt.label}
+                    </OptionButton>
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* Buttons */}
-          <div className="flex justify-between pt-6">
+          {/* Nav buttons */}
+          <div className="mt-10 flex items-center justify-between border-t border-border pt-6">
             <Button
               variant="ghost"
               disabled={stepIndex === 1}
               onClick={goToPreviousStep}
             >
-              <ChevronLeftIcon className="h-4 w-4 mr-1" />
+              <ChevronLeftIcon className="mr-1 h-4 w-4" />
               Back
             </Button>
 
             {stepIndex < 4 ? (
-              <Button
-                onClick={goToNextStep}
-                className="bg-accent hover:bg-accent/90 text-accent-foreground"
-              >
+              <Button onClick={goToNextStep}>
                 Next
-                <ChevronRightIcon className="h-4 w-4 ml-1" />
+                <ChevronRightIcon className="ml-1 h-4 w-4" />
               </Button>
             ) : (
               <Button
@@ -324,14 +301,13 @@ export function UserForm({ onSubmit, isLoading }: UserFormProps) {
                   !formData.height ||
                   !formData.weight
                 }
-                className="bg-accent hover:bg-accent/90 text-accent-foreground"
               >
-                Generate Plan
+                {isLoading ? "Generating…" : "Generate Plan"}
               </Button>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </Framed>
     </div>
   );
 }

@@ -25,6 +25,7 @@ interface PlanDisplayProps {
   userProfile: UserProfile;
   onRegenerate: () => void;
   isLoading: boolean;
+  onReset?: () => void;
 }
 
 export function PlanDisplay({
@@ -32,6 +33,7 @@ export function PlanDisplay({
   userProfile,
   onRegenerate,
   isLoading,
+  onReset,
 }: PlanDisplayProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingSection, setSpeakingSection] = useState<
@@ -97,35 +99,41 @@ export function PlanDisplay({
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-16 px-4">
+    <div className="mx-auto max-w-5xl space-y-8 px-4 pb-16">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <p className="text-sm text-primary font-semibold uppercase">
-          AI Generated Plan
+      <div className="space-y-3 text-center">
+        <p className="font-mono text-[0.7rem] uppercase tracking-[0.25em] text-primary">
+          AI-generated plan
         </p>
 
-        <h2 className="text-3xl font-bold">
-          Hi {userProfile.name}, here’s your plan 🎯
+        <h2 className="font-display text-3xl font-bold tracking-tight">
+          Hi {userProfile.name}, here&rsquo;s your plan
         </h2>
 
         <p className="text-muted-foreground">
           Goal:{" "}
-          <span className="font-semibold">
+          <span className="font-medium capitalize text-foreground">
             {userProfile.fitnessGoal.replace("-", " ")}
           </span>
         </p>
 
-        <div className="flex gap-3 justify-center mt-3">
+        <div className="mt-3 flex justify-center gap-3">
+          {onReset && (
+            <Button variant="ghost" onClick={onReset} disabled={isLoading}>
+              New Plan
+            </Button>
+          )}
+
           <Button variant="outline" onClick={exportToPDF}>
-            <DownloadIcon className="h-4 w-4 mr-2" />
+            <DownloadIcon className="mr-2 h-4 w-4" />
             Export
           </Button>
 
           <Button onClick={onRegenerate} disabled={isLoading}>
             <RefreshIcon
-              className={cn("h-4 w-4 mr-2", isLoading && "animate-spin")}
+              className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")}
             />
-            {isLoading ? "Regenerating..." : "Optimize Plan"}
+            {isLoading ? "Regenerating…" : "Optimize Plan"}
           </Button>
         </div>
       </div>
@@ -150,13 +158,13 @@ export function PlanDisplay({
         {/* Workout */}
         <TabsContent value="workout" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-lg flex items-center gap-2">
-              <DumbbellIcon className="h-5 w-5" /> Workout Plan
+            <h3 className="flex items-center gap-2 font-display text-lg font-bold">
+              <DumbbellIcon className="h-5 w-5 text-primary" /> Workout Plan
             </h3>
 
             <Button
               size="sm"
-              variant="secondary"
+              variant="outline"
               onClick={() =>
                 isSpeaking && speakingSection === "workout"
                   ? stopSpeaking()
@@ -169,21 +177,23 @@ export function PlanDisplay({
           </div>
 
           {/* GRID LAYOUT HERE */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {plan.workoutPlan.map((day, i) => (
-              <Card key={i} className="hover:shadow-md transition">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg text-red-600/60">
-                    <span className="gradient-text">{day.day}</span>
+              <Card key={i} className="hover-lift gap-3">
+                <CardHeader className="pb-0">
+                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-primary">
+                    {day.day}
+                  </p>
+                  <CardTitle className="font-display text-lg">
+                    {day.focus}
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground">{day.focus}</p>
                 </CardHeader>
 
-                <CardContent className="space-y-2">
-                  <p className="text-xs text-muted-foreground flex items-center gap-2">
-                    <ClockIcon className="h-4 w-4" /> {day.duration}
-                    <span>•</span>
-                    <FlameIcon className="h-4 w-4 text-primary" />
+                <CardContent className="space-y-3">
+                  <p className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
+                    <ClockIcon className="h-3.5 w-3.5" /> {day.duration}
+                    <span className="text-border">|</span>
+                    <FlameIcon className="h-3.5 w-3.5 text-primary" />
                     {day.caloriesBurned} kcal
                   </p>
 
@@ -194,12 +204,12 @@ export function PlanDisplay({
                         onClick={() =>
                           setSelectedItem({ type: "exercise", name: ex.name })
                         }
-                        className="w-full text-left px-3 py-2 border rounded-lg hover:bg-accent/10 transition text-xs"
+                        className="w-full rounded-md border border-border bg-secondary/30 px-3 py-2 text-left text-xs transition hover:border-primary/40 hover:bg-secondary"
                       >
                         <span className="font-semibold">{ex.name}</span>
                         <br />
-                        <span className="text-muted-foreground">
-                          {ex.sets} Sets • {ex.reps} Reps
+                        <span className="font-mono text-muted-foreground">
+                          {ex.sets} sets · {ex.reps} reps
                         </span>
                       </button>
                     ))}
@@ -214,9 +224,12 @@ export function PlanDisplay({
         <TabsContent value="diet" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex gap-2 items-center">
+              <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-primary">
+                Daily target
+              </p>
+              <CardTitle className="flex items-center gap-2 font-display text-xl">
                 <FlameIcon className="h-5 w-5 text-primary" />
-                Daily Calories: {plan.dietPlan.totalCalories}
+                {plan.dietPlan.totalCalories} kcal
               </CardTitle>
             </CardHeader>
 
@@ -231,22 +244,24 @@ export function PlanDisplay({
                   onClick={() =>
                     setSelectedItem({ type: "meal", name: m.meal.name })
                   }
-                  className="w-full flex justify-between items-center p-3 border rounded-lg hover:bg-accent/10 transition"
+                  className="flex w-full items-center justify-between rounded-md border border-border bg-secondary/30 p-3 transition hover:border-primary/40 hover:bg-secondary"
                 >
-                  <span className="font-semibold">{m.label}</span>
-                  <span>{m.meal.name}</span>
+                  <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                    {m.label}
+                  </span>
+                  <span className="font-medium">{m.meal.name}</span>
                 </button>
               ))}
 
               <Button
-                variant="secondary"
+                variant="outline"
                 onClick={() =>
                   isSpeaking && speakingSection === "diet"
                     ? stopSpeaking()
                     : speakPlan("diet")
                 }
               >
-                <VolumeIcon className="h-4 w-4 mr-2" />
+                <VolumeIcon className="mr-2 h-4 w-4" />
                 {isSpeaking && speakingSection === "diet" ? "Stop" : "Listen"}
               </Button>
             </CardContent>
@@ -255,16 +270,18 @@ export function PlanDisplay({
 
         {/* Tips */}
         <TabsContent value="tips" className="space-y-4">
-          <div className="text-center">
-            <QuoteIcon className="h-6 w-6 mx-auto text-primary mb-2" />
-            <p className="italic text-lg">{plan.motivation}</p>
+          <div className="mx-auto max-w-2xl text-center">
+            <QuoteIcon className="mx-auto mb-3 h-6 w-6 text-primary" />
+            <p className="font-display text-lg italic">{plan.motivation}</p>
           </div>
 
           {plan.tips.map((tip, i) => (
             <Card key={i}>
-              <CardContent className="flex gap-2 py-4">
-                <CheckIcon className="h-5 w-5 text-primary" />
-                <p>{tip}</p>
+              <CardContent className="flex items-start gap-3 py-4">
+                <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
+                  <CheckIcon className="h-3.5 w-3.5" />
+                </span>
+                <p className="text-sm">{tip}</p>
               </CardContent>
             </Card>
           ))}
