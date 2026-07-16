@@ -47,6 +47,10 @@ export interface Meal {
   protein: string
   carbs: string
   fats: string
+  ingredients?: string[]
+  instructions?: string[]
+  servingSize?: string
+  prepTime?: string
 }
 
 export interface DietDay {
