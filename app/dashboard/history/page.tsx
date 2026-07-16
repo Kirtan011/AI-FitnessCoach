@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { WorkoutCalendar } from "@/components/workout-calendar";
 import { WorkoutHistory } from "@/components/workout-history";
 import { LoadingScreen } from "@/components/loading-screen";
+import { AnalyticsDashboard } from "@/components/analytics-dashboard";
 
 export default function HistoryPage() {
   const [workoutHistory, setWorkoutHistory] = useState<any[]>([]);
@@ -31,11 +32,14 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="w-full max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500 pb-12">
       <div>
         <h1 className="font-display text-3xl font-bold tracking-tight mb-2">History & Analytics</h1>
         <p className="text-muted-foreground">Track your progress and view past workouts.</p>
       </div>
+      
+      <AnalyticsDashboard sessions={workoutHistory} />
+      
       <WorkoutCalendar workoutDates={workoutHistory.map((h) => h.date)} />
       <WorkoutHistory sessions={workoutHistory} />
     </div>

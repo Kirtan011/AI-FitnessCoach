@@ -15,7 +15,7 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Appearance</CardTitle>
-          <CardDescription>Customize the look and feel of FitChamp.</CardDescription>
+          <CardDescription>Customize the look and feel of FitFlow.</CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-between">
           <span>Theme</span>
