@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { DotGrid, Logo } from "@/components/shared";
 
-export const metadata: Metadata = { title: "Sign up - FitChamp" };
+export const metadata: Metadata = { title: "Sign up - FitFlow" };
 
 export default function RegisterPage() {
   return (

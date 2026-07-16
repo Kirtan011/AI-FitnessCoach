@@ -116,7 +116,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
-              FitChamp builds personalized workouts and nutrition around your
+              FitFlow builds personalized workouts and nutrition around your
               body, goals, and schedule — ready in seconds. Works for the gym,
               home, or outdoors.
             </p>
@@ -297,7 +297,7 @@ export default function LandingPage() {
                   <Highlight>We make it easy to stay consistent.</Highlight>
                 </h2>
                 <p className="mt-5 max-w-md text-muted-foreground">
-                  A plan you actually follow is the one that works. FitChamp
+                  A plan you actually follow is the one that works. FitFlow
                   keeps your program realistic, structured, and adjustable so the
                   graph keeps going up.
                 </p>
@@ -376,7 +376,7 @@ export default function LandingPage() {
       {/* ── Footer ──────────────────────────────────────────── */}
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-10 sm:flex-row">
-          <Logo size="sm" />
+          <Logo />
           <p className="text-center text-xs text-muted-foreground sm:text-right">
             Made by Kirtan Suthar · Personalized fitness plans to achieve your goals
           </p>

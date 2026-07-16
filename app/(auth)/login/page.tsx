@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { DotGrid, Logo } from "@/components/shared";
 
-export const metadata: Metadata = { title: "Sign in - FitChamp" };
+export const metadata: Metadata = { title: "Sign in - FitFlow" };
 
 export default function LoginPage() {
   return (
@@ -25,7 +25,7 @@ export default function LoginPage() {
               Welcome back
             </p>
             <CardTitle className="font-display text-2xl font-bold">
-              Sign in to FitChamp
+              Sign in to FitFlow
             </CardTitle>
             <CardDescription>Continue to your dashboard</CardDescription>
           </CardHeader>
