@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DumbbellIcon, VolumeIcon, FlameIcon, ClockIcon, SparklesIcon, PlayIcon } from "@/components/icons";
+import { DumbbellIcon, VolumeIcon, FlameIcon, ClockIcon, ZapIcon, PlayIcon } from "@/components/icons";
 import type { FitnessPlan } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -42,17 +42,13 @@ export function WorkoutTab({
     );
   }
   const handleStartWorkout = async (day: any) => {
-    if (!planId) {
-      alert("No active plan found to start a workout from.");
-      return;
-    }
     setStartingDay(day.day);
     try {
       const response = await fetch("/api/workout-session/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fitnessPlanId: planId,
+          ...(planId ? { fitnessPlanId: planId } : {}),
           workoutName: `${day.day} - ${day.focus}`,
           workoutType: "HOME",
         }),
@@ -203,7 +199,7 @@ export function WorkoutTab({
       {plan.cooldown && plan.cooldown.length > 0 && (
         <div className="mt-6">
           <h4 className="font-display text-md font-bold mb-3 flex items-center gap-2">
-            <SparklesIcon className="h-4 w-4 text-blue-500" /> Cool-down Routine
+            <ZapIcon className="h-4 w-4 text-blue-500" /> Cool-down Routine
           </h4>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {plan.cooldown.map((ex, idx) => (
