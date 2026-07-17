@@ -15,6 +15,7 @@ export async function GET() {
       },
       include: {
         records: true,
+        feedback: true,
       },
       orderBy: {
         date: "desc",
@@ -27,7 +28,9 @@ export async function GET() {
       workoutName: s.workoutName,
       duration: s.duration || 0,
       calories: s.calories || 0,
+      completionPercentage: s.completionPercentage || 0,
       exercises: s.records.map((r: any) => r.exerciseName),
+      feedback: s.feedback,
     }));
 
     return NextResponse.json(formattedSessions);
