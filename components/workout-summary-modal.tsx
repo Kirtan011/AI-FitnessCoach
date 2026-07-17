@@ -70,8 +70,8 @@ export function WorkoutSummaryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-4 overflow-y-auto">
-      <Card className="w-full max-w-lg border-primary/20 shadow-xl shadow-primary/5 animate-in fade-in zoom-in-95">
+    <div className="fixed inset-0 z-50 bg-background flex items-start justify-center p-4 overflow-y-auto">
+      <Card className="w-full max-w-lg border-primary/20 shadow-xl shadow-primary/5 animate-in fade-in zoom-in-95 mt-8 mb-8">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/10 w-16 h-16 flex items-center justify-center rounded-full mb-4">
             <SparklesIcon className="w-8 h-8 text-primary" />

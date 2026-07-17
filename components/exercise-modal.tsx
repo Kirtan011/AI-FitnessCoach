@@ -31,6 +31,16 @@ export function ExerciseModal({ exercise, isOpen, onClose }: ExerciseModalProps)
         </DialogHeader>
 
         <div className="space-y-6 pt-4">
+          {/* Generated Exercise Image */}
+          <div className="w-full h-48 rounded-lg overflow-hidden border border-border bg-secondary/30 relative">
+            <img 
+              src={`https://image.pollinations.ai/prompt/gym%20exercise%20${encodeURIComponent(exercise.name)}?width=800&height=400&nologo=true`}
+              alt={exercise.name}
+              className="w-full h-full object-cover transition-opacity duration-300"
+              loading="lazy"
+            />
+          </div>
+
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-lg border bg-secondary/30 p-3">
@@ -117,7 +127,7 @@ export function ExerciseModal({ exercise, isOpen, onClose }: ExerciseModalProps)
           {/* Notes */}
           {exercise.notes && (
             <div className="rounded-lg bg-primary/10 p-4 border border-primary/20">
-              <p className="text-sm text-primary-foreground font-medium">Trainer Note:</p>
+              <p className="text-sm text-primary font-medium">Trainer Note:</p>
               <p className="text-sm text-primary/80 mt-1">{exercise.notes}</p>
             </div>
           )}
