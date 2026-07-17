@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { PlanDisplay } from "@/components/plan-display";
 import { LoadingScreen } from "@/components/loading-screen";
 import { DashboardOverview } from "@/components/dashboard-overview";
 import type { UserProfile, FitnessPlan } from "@/lib/types";
 
-export default function DashboardPage() {
+function DashboardPageContent() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [fitnessPlan, setFitnessPlan] = useState<FitnessPlan | null>(null);
   const [planId, setPlanId] = useState<string | null>(null);
@@ -15,11 +16,15 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     async function loadSavedPlan() {
       try {
-        const response = await fetch("/api/fitness-plan");
+        setIsInitialLoading(true);
+        const idParam = searchParams.get("planId");
+        const url = idParam ? `/api/fitness-plan?id=${idParam}` : "/api/fitness-plan";
+        const response = await fetch(url);
         if (response.ok) {
           const data = await response.json();
           if (data && data.profile && data.plan && data.id) {
@@ -46,7 +51,7 @@ export default function DashboardPage() {
       }
     }
     loadSavedPlan();
-  }, [router]);
+  }, [router, searchParams]);
 
   const handleRegenerate = async () => {
     if (userProfile) {
@@ -97,6 +102,45 @@ export default function DashboardPage() {
     }
   };
 
+  const handleSwapMeal = async (mealType: string, preference: "veg" | "non-veg") => {
+    if (!fitnessPlan || !fitnessPlan.dietPlan) return;
+    const currentMeal = (fitnessPlan.dietPlan as any)[mealType];
+    if (!currentMeal) return;
+
+    try {
+      const response = await fetch("/api/swap-meal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          planId,
+          mealType,
+          currentMeal,
+          preference,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to swap meal");
+
+      const data = await response.json();
+      if (data.updatedPlan) {
+        setFitnessPlan(data.updatedPlan);
+      } else if (data.meal) {
+        // Optimistic / local update if DB update failed or no user session
+        setFitnessPlan((prev) => {
+          if (!prev) return prev;
+          const updated = { ...prev };
+          if (updated.dietPlan) {
+            (updated.dietPlan as any)[mealType] = data.meal;
+          }
+          return updated;
+        });
+      }
+    } catch (error) {
+      console.error("Error swapping meal:", error);
+      alert("Failed to swap meal. Please try again.");
+    }
+  };
+
   if (isInitialLoading) {
     return <LoadingScreen message="Loading your plan..." subtitle="Dashboard" />;
   }
@@ -110,7 +154,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto animate-in fade-in duration-500 space-y-8 pb-12">
+    <div className="w-full max-w-4xl mx-auto animate-in fade-in duration-500 space-y-8 pb-12">
       <DashboardOverview stats={stats} />
       
       <PlanDisplay
@@ -120,7 +164,16 @@ export default function DashboardPage() {
         onRegenerate={handleRegenerate}
         onReset={handleReset}
         isLoading={isLoading}
+        onSwapMeal={handleSwapMeal}
       />
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<LoadingScreen message="Loading your plan..." subtitle="Dashboard" />}>
+      <DashboardPageContent />
+    </Suspense>
   );
 }

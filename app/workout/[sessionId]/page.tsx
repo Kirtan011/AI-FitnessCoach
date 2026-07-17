@@ -6,15 +6,16 @@ import { ActiveWorkout } from "@/components/active-workout";
 export default async function WorkoutSessionPage({
   params,
 }: {
-  params: { sessionId: string };
+  params: Promise<{ sessionId: string }>;
 }) {
+  const { sessionId } = await params;
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/login");
   }
 
   const workoutSession = await prisma.workoutSession.findUnique({
-    where: { id: params.sessionId },
+    where: { id: sessionId },
     include: { fitnessPlan: true },
   });
 
