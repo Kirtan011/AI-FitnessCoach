@@ -12,6 +12,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const profile: UserProfile = body.profile || body
     const isRegenerate: boolean = body.isRegenerate || false
+    const saveToDb: boolean = body.saveToDb !== undefined ? body.saveToDb : true
 
     let pastWorkouts = "";
     if (session?.user?.id) {
@@ -55,8 +56,23 @@ export async function POST(request: Request) {
       }
     }
 
+    // CRITICAL FIX: Ensure dietPlan, motivation, and tips are never missing (in case AI hallucinates or truncates)
+    const fallback = generateFallbackPlan(profile, isRegenerate);
+    
+    // Ensure plan is a valid object
+    if (!plan || typeof plan !== 'object' || Array.isArray(plan)) {
+      plan = fallback;
+    } else {
+      if (!plan.dietPlan || typeof plan.dietPlan !== 'object' || Object.keys(plan.dietPlan).length === 0) plan.dietPlan = fallback.dietPlan;
+      if (!plan.motivation || typeof plan.motivation !== 'string') plan.motivation = fallback.motivation;
+      if (!plan.tips || !Array.isArray(plan.tips) || plan.tips.length === 0) plan.tips = fallback.tips;
+      if (!plan.workoutPlan || !Array.isArray(plan.workoutPlan) || plan.workoutPlan.length === 0) plan.workoutPlan = fallback.workoutPlan;
+      if (!plan.warmup || !Array.isArray(plan.warmup)) plan.warmup = [];
+      if (!plan.cooldown || !Array.isArray(plan.cooldown)) plan.cooldown = [];
+    }
+
     let savedPlanId = null;
-    if (session?.user?.id) {
+    if (session?.user?.id && saveToDb) {
       try {
         const savedPlan = await prisma.fitnessPlan.create({
           data: {
@@ -70,6 +86,8 @@ export async function POST(request: Request) {
       } catch (dbError) {
         console.error("❌ Failed to save plan to database:", dbError)
       }
+    } else if (!saveToDb) {
+      console.log(`ℹ️ Skipped saving plan to DB (saveToDb is false)`)
     }
 
     return NextResponse.json({ id: savedPlanId, ...plan })
