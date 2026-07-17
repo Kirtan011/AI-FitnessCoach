@@ -17,35 +17,33 @@ const sizes = {
   lg: { box: "size-9", icon: "size-5", text: "text-2xl" },
 } as const;
 
-/** FitChamp brand lockup: blue square mark + wordmark. */
+/** FitFlow brand lockup */
 export function Logo({ className, iconOnly = false, href, size = "md" }: LogoProps) {
-  const s = sizes[size];
+  const isSmall = size === "sm";
+  
+  // Use logo2 when iconOnly is true, full logo otherwise
+  const lightLogoSrc = iconOnly ? "/logo2_light.png" : "/logo_light.png";
+  const darkLogoSrc = iconOnly ? "/logo2_dark.png" : "/logo_dark.png";
+  
+  // The logo images already contain the name, so we don't render separate text.
   const content = (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <span
-        className={cn(
-          "grid place-items-center rounded-md bg-primary text-primary-foreground shadow-sm",
-          s.box
-        )}
-      >
-        <DumbbellIcon className={s.icon} />
-      </span>
-      {!iconOnly && (
-        <span
-          className={cn(
-            "font-display font-bold tracking-tight text-foreground",
-            s.text
-          )}
-        >
-          FitChamp
-        </span>
-      )}
+      <img 
+        src={lightLogoSrc} 
+        alt="FitFlow Logo" 
+        className={cn("object-contain dark:hidden w-auto", isSmall ? "max-h-8" : "max-h-10")} 
+      />
+      <img 
+        src={darkLogoSrc} 
+        alt="FitFlow Logo" 
+        className={cn("object-contain hidden dark:block w-auto", isSmall ? "max-h-8" : "max-h-10")} 
+      />
     </span>
   );
 
   if (href) {
     return (
-      <Link href={href} className="inline-flex items-center" aria-label="FitChamp home">
+      <Link href={href} className="inline-flex items-center" aria-label="FitFlow home">
         {content}
       </Link>
     );

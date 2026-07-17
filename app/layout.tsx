@@ -24,7 +24,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FitChamp - Your AI Fitness Coach",
+  title: "FitFlow - Your AI Fitness Coach",
   description: "AI-powered personalized workout and diet plans",
   generator: "Next.js",
   icons: {

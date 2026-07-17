@@ -7,3 +7,4 @@ export { Highlight } from "./highlight";
 export { Pill } from "./pill";
 export { Logo } from "./logo";
 export { Gradient } from "./gradient";
+export { ImageWithFallback } from "./image-with-fallback";
