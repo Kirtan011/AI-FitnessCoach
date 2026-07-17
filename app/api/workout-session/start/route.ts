@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { fitnessPlanId, workoutName, workoutType } = body;
 
-    if (!fitnessPlanId || !workoutName) {
+    if (!workoutName) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const workoutSession = await prisma.workoutSession.create({
       data: {
         userId: session.user.id,
-        fitnessPlanId,
+        ...(fitnessPlanId ? { fitnessPlanId } : {}),
         workoutName,
         workoutType: workoutType || "HOME",
         status: "IN_PROGRESS",
