@@ -27,20 +27,32 @@ Rules for JSON generation:
 - "sets" (integer)
 - "reps" (string)
 - "restTime" (string)
-- "instructions" (step-by-step text)
+- "instructions" (A step-by-step numbered list explaining how to perform the exercise, with each step on a new line using \\n)
 - "targetMuscles" (array of strings)
 - "difficulty" ("beginner", "intermediate", "advanced")
 - "calories" (estimated string)
 - "videoUrl" (a YouTube search query URL, e.g. "https://www.youtube.com/results?search_query=Push+Up+Tutorial")
 - "substitutions" (array of 2 alternate exercises that strictly use the available equipment or bodyweight)
-- "notes"
+- "notes" (A concise, personalized string with actionable guidance on form, breathing, common mistakes, and safety precautions)
 
 CRITICAL: Do NOT prescribe exercises requiring equipment the user does not have. Use the substitutions array for alternative variations based on the same muscle group.
+CRITICAL: You MUST include the "dietPlan", "tips", and "motivation" fields exactly as shown in the structure. They must not be empty or omitted under any circumstances.
 
 Return ONLY this exact JSON structure (no markdown):
-{"warmup":[{"name":"Jumping Jacks","sets":1,"reps":"30s","restTime":"0s","instructions":"...","targetMuscles":["Full Body"],"difficulty":"beginner","calories":"20","videoUrl":"...","substitutions":["High Knees"]}],"workoutPlan":[{"day":"Day 1","focus":"Full Body","duration":"45 min","caloriesBurned":"300","exercises":[{"name":"Exercise","sets":3,"reps":"12","restTime":"60s","instructions":"...","targetMuscles":["Chest"],"difficulty":"beginner","calories":"50","videoUrl":"...","substitutions":["..."],"notes":"..."}]}],"cooldown":[{"name":"Stretching","sets":1,"reps":"1 min","restTime":"0s","instructions":"...","targetMuscles":["Full Body"],"difficulty":"beginner","calories":"10","videoUrl":"...","substitutions":["..."]}],"dietPlan":{"breakfast":{"name":"Meal","description":"desc","calories":"300","protein":"20g","carbs":"30g","fats":"10g"},"midMorningSnack":{"name":"Snack","description":"desc","calories":"150","protein":"10g","carbs":"15g","fats":"5g"},"lunch":{"name":"Lunch","description":"desc","calories":"450","protein":"30g","carbs":"40g","fats":"15g"},"eveningSnack":{"name":"Snack","description":"desc","calories":"150","protein":"10g","carbs":"15g","fats":"5g"},"dinner":{"name":"Dinner","description":"desc","calories":"500","protein":"35g","carbs":"35g","fats":"20g"},"totalCalories":"1550"},"tips":["tip1","tip2"],"motivation":"Stay strong!"}
+{"warmup":[{"name":"Jumping Jacks","sets":1,"reps":"30s","restTime":"0s","instructions":"1. Stand tall\\n2. Jump...","targetMuscles":["Full Body"],"difficulty":"beginner","calories":"20","videoUrl":"...","substitutions":["High Knees"]}],"workoutPlan":[{"day":"Day 1","focus":"Full Body","duration":"45 min","caloriesBurned":"300","exercises":[{"name":"Exercise","sets":3,"reps":"12","restTime":"60s","instructions":"1. Step one\\n2. Step two","targetMuscles":["Chest"],"difficulty":"beginner","calories":"50","videoUrl":"...","substitutions":["..."],"notes":"..."}]}],"cooldown":[{"name":"Stretching","sets":1,"reps":"1 min","restTime":"0s","instructions":"1. Stretch","targetMuscles":["Full Body"],"difficulty":"beginner","calories":"10","videoUrl":"...","substitutions":["..."]}],"dietPlan":{"breakfast":{"name":"Meal","description":"desc","calories":"300","protein":"20g","carbs":"30g","fats":"10g","ingredients":["Item 1","Item 2"],"instructions":["Step 1","Step 2"],"servingSize":"1 bowl","prepTime":"10 min"},"midMorningSnack":{"name":"Snack","description":"desc","calories":"150","protein":"10g","carbs":"15g","fats":"5g","ingredients":["Item 1"],"instructions":["Step 1"],"servingSize":"1 piece","prepTime":"2 min"},"lunch":{"name":"Lunch","description":"desc","calories":"450","protein":"30g","carbs":"40g","fats":"15g","ingredients":["Item 1"],"instructions":["Step 1"],"servingSize":"1 plate","prepTime":"15 min"},"eveningSnack":{"name":"Snack","description":"desc","calories":"150","protein":"10g","carbs":"15g","fats":"5g","ingredients":["Item 1"],"instructions":["Step 1"],"servingSize":"1 piece","prepTime":"2 min"},"dinner":{"name":"Dinner","description":"desc","calories":"500","protein":"35g","carbs":"35g","fats":"20g","ingredients":["Item 1"],"instructions":["Step 1"],"servingSize":"1 plate","prepTime":"20 min"},"totalCalories":"1550"},"tips":["tip1","tip2"],"motivation":"Stay strong!"}
 
 Create 7 days with ${exerciseCount} exercises each. Output ONLY valid JSON.`
+}
+
+export function buildMealSwapPrompt(currentMealName: string, calories: string, preference: "veg" | "non-veg"): string {
+  return `Generate a new single meal JSON to replace "${currentMealName}".
+Dietary Preference: ${preference === "veg" ? "Vegetarian (No meat)" : "Non-vegetarian (Can include meat)"}.
+Target Calories: Around ${calories}.
+
+Return ONLY this exact JSON structure (no markdown):
+{"name":"New Meal Name","description":"A short delicious description","calories":"${calories}","protein":"20g","carbs":"30g","fats":"10g","ingredients":["Item 1","Item 2"],"instructions":["Step 1","Step 2"],"servingSize":"1 bowl","prepTime":"10 min"}
+
+Output ONLY valid JSON.`;
 }
 
 export async function generateWithGroq(prompt: string): Promise<string> {
@@ -57,6 +69,8 @@ export async function generateWithGroq(prompt: string): Promise<string> {
       model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
+      max_tokens: 4000,
+      temperature: 0.2,
     }),
   })
 

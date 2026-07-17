@@ -4,11 +4,12 @@ export interface Exercise {
   reps: string
   restTime: string
   notes: string
+  instructions?: string
 }
 
 export const HOME_EXERCISES: Exercise[] = [
-  { name: "Push-ups", sets: 3, reps: "15", restTime: "45s", notes: "Keep core tight" },
-  { name: "Squats", sets: 4, reps: "20", restTime: "60s", notes: "Go deep" },
+  { name: "Push-ups", sets: 3, reps: "15", restTime: "45s", notes: "Keep core tight", instructions: "1. Start in a high plank position\n2. Lower your body until chest is just above floor\n3. Push back up to starting position" },
+  { name: "Squats", sets: 4, reps: "20", restTime: "60s", notes: "Go deep", instructions: "1. Stand with feet shoulder-width apart\n2. Lower hips back and down as if sitting in a chair\n3. Keep chest up and knees over toes\n4. Push through heels to return to standing" },
   { name: "Lunges", sets: 3, reps: "12 each leg", restTime: "45s", notes: "Keep balance" },
   { name: "Plank", sets: 3, reps: "45 seconds", restTime: "30s", notes: "Engage abs" },
   { name: "Burpees", sets: 3, reps: "10", restTime: "60s", notes: "Full range motion" },
@@ -18,8 +19,8 @@ export const HOME_EXERCISES: Exercise[] = [
 ]
 
 export const GYM_EXERCISES: Exercise[] = [
-  { name: "Bench Press", sets: 4, reps: "10", restTime: "90s", notes: "Control the weight" },
-  { name: "Deadlifts", sets: 4, reps: "8", restTime: "120s", notes: "Keep back straight" },
+  { name: "Bench Press", sets: 4, reps: "10", restTime: "90s", notes: "Control the weight", instructions: "1. Lie flat on bench with feet planted\n2. Grip bar slightly wider than shoulder-width\n3. Lower bar to mid-chest in a controlled motion\n4. Press bar back up to full extension" },
+  { name: "Deadlifts", sets: 4, reps: "8", restTime: "120s", notes: "Keep back straight", instructions: "1. Stand with feet hip-width apart under the barbell\n2. Hinge at hips and grip the bar outside your knees\n3. Keep back flat, chest up, and pull slack out of bar\n4. Drive through the floor with your legs to stand up straight\n5. Lower under control" },
   { name: "Lat Pulldown", sets: 3, reps: "12", restTime: "60s", notes: "Squeeze at bottom" },
   { name: "Leg Press", sets: 4, reps: "12", restTime: "90s", notes: "Full range" },
   { name: "Shoulder Press", sets: 3, reps: "10", restTime: "60s", notes: "Don't lock elbows" },
