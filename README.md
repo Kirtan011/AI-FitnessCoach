@@ -1,101 +1,84 @@
-# FitChamp - AI-Powered Fitness Coach
+# FitFlow - AI-Powered Fitness Coach
 
-FitChamp is an intelligent fitness application that creates personalized workout routines and nutrition plans tailored to your unique goals, body type, and lifestyle. Using advanced AI technology, it delivers custom fitness plans that adapt to your preferences and needs.
+FitFlow is an intelligent fitness application that creates personalized workout routines and nutrition plans tailored to your unique goals, body type, and lifestyle. Using advanced AI technology, it delivers custom fitness plans that adapt to your preferences and needs.
 
 ## 🚀 Features
 
 - **Personalized Fitness Plans**: Generate custom workout routines based on your fitness level, goals, and available equipment
-- **Custom Nutrition Plans**: Get tailored meal plans according to your dietary preferences (vegan, vegetarian, non-veg, keto)
-- **Multiple Workout Locations**: Plans for home, gym, or outdoor workouts
+- **Nutrition Advice**: Get tailored meal recommendations that align with your fitness goals
 - **Adaptive AI**: Uses AI to create dynamic and evolving fitness plans
-- **Progress Tracking**: Tips and motivation to keep you on track
+- **Dashboard**: Track your plans and active workouts in an intuitive dashboard
 - **Export Functionality**: Download your fitness plan as a PDF
-- **Responsive Design**: Works seamlessly across all devices
-- **Motivational Content**: Daily inspiration and quotes to keep you motivated
 
-## 🛠️ Tech Stack
+## 🛠️ Technology Stack
 
-- **Framework**: Next.js 16
-- **Styling**: Tailwind CSS with shadcn/ui components
-- **API**: Next.js API routes
-- **Icons**: Lucide React
-- **State Management**: React Hooks
-- **Deployment**: Vercel
+- **Framework**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS, shadcn/ui
+- **Authentication**: NextAuth.js
+- **Database**: PostgreSQL (via Prisma ORM)
+- **AI Integration**: Pollinations.ai API
 
 ## 📋 Prerequisites
 
+Before you begin, ensure you have the following installed:
 - Node.js (v18 or higher)
-- npm or pnpm package manager
+- npm or pnpm
+- PostgreSQL database
 
-## 🚀 Getting Started
+## ⚙️ Setup Instructions
 
-### Installation
-
-1. Clone the repository:
-
+1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   ```
-
-2. Navigate to the project directory:
-
-   ```bash
+   git clone https://github.com/yourusername/ai-fitness-assistant.git
    cd ai-fitness-assistant
    ```
 
-3. Install dependencies:
-
+2. **Install dependencies**
    ```bash
-   # Using pnpm (recommended)
-   pnpm install
-
-   # Or using npm
    npm install
-   ```
-
-### Running the Application
-
-1. Start the development server:
-
-   ```bash
-   pnpm dev
    # or
-   npm run dev
+   pnpm install
    ```
 
-2. Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
+3. **Set up environment variables**
+   Create a `.env` file in the root directory and add the necessary variables (see `.env.example` if available, or ask for the required keys).
+   - Database connection string
+   - NextAuth secret
 
-## 🎯 How It Works
+4. **Initialize Database**
+   ```bash
+   npx prisma db push
+   # or
+   npx prisma migrate dev
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run dev
+   # or
+   pnpm dev
+   ```
+
+6. **Open the application**
+   Navigate to `http://localhost:3000` in your browser.
+
+## 🤸 How It Works
 
 1. **User Profile Creation**: Enter your personal information including name, age, height, weight, fitness goals, and preferences
-2. **AI Plan Generation**: The application uses AI to generate a personalized workout and nutrition plan
+2. **Plan Generation**: The app sends your data to the AI model which crafts a customized plan
 3. **Plan Review**: Review your custom fitness plan with detailed exercises and meal descriptions
-4. **Track Progress**: Follow the plan with helpful tips and stay motivated with AI-generated quotes
+4. **Action**: Start your workout directly from the app dashboard
 
 ### Fitness Goals Supported
-
 - Weight Loss
 - Muscle Gain
 - Maintenance
 - Endurance
 - Flexibility
 
-### Dietary Preferences
-
-- Vegetarian
-- Non-Vegetarian
-- Vegan
-- Keto
-
-### Workout Locations
-
-- Home workouts
-- Gym-based routines
-- Outdoor exercises
-
 ## 🤖 AI Integration
 
-FitChamp uses the Pollinations.ai API to generate personalized fitness and nutrition plans. The application also includes a fallback system that generates quality plans even when the AI service is unavailable.
+FitFlow uses the Pollinations.ai API to generate personalized fitness and nutrition plans. The application also includes a fallback system that generates quality plans even when the AI service is unavailable.
 
 ## 📱 Usage
 
