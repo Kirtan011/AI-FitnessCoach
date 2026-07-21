@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, Check, Dumbbell, Salad, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Check, Dumbbell, Salad, Sparkles, Activity, Target, Volume2, FileText, RefreshCw, LineChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme-toggle";
 import {
   DotGrid,
   Framed,
@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { label: "How it works", href: "#how-it-works" },
   { label: "What you get", href: "#what-you-get" },
+  { label: "Features", href: "#features" },
   { label: "Results", href: "#results" },
 ];
 
@@ -56,6 +57,39 @@ const capabilities = [
   },
 ];
 
+const platformFeatures = [
+  {
+    title: "AI-Powered Generation",
+    desc: "Instantly create personalized workout and diet plans tailored to your exact goals, experience level, and schedule.",
+    svg: "/clipart/undraw_morning-workout_73u9.svg",
+  },
+  {
+    title: "Smart Meal Swapping",
+    desc: "Don't like a suggested meal? Instantly swap it for an AI-generated alternative that matches your macros.",
+    svg: "/clipart/undraw_healthy-habit_2ata.svg",
+  },
+  {
+    title: "Advanced Analytics",
+    desc: "Track your calorie burn trend, plan adherence, and workout difficulty in a comprehensive dashboard.",
+    svg: "/clipart/undraw_fitness-stats_bd09.svg",
+  },
+  {
+    title: "Target Muscle Focus",
+    desc: "Want to hit a specific muscle group today? Generate targeted workouts on the fly outside of your main plan.",
+    svg: "/clipart/undraw_working-out_6ksl.svg",
+  },
+  {
+    title: "Interactive Audio Coach",
+    desc: "Go hands-free. Listen to your workout sets, reps, and diet plan narrated aloud via built-in speech synthesis.",
+    svg: "/clipart/undraw_meditation_k4oa.svg",
+  },
+  {
+    title: "Printable PDF Export",
+    desc: "Take your plan anywhere. Instantly export your personalized fitness and nutrition program to a beautifully formatted PDF.",
+    svg: "/clipart/undraw_pilates_i5uo.svg",
+  }
+];
+
 const previewExercises = [
   ["Bench Press", "4 × 8"],
   ["Incline Dumbbell Press", "3 × 10"],
@@ -71,7 +105,7 @@ const progress = [
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen bg-background">
+    <div className="dark relative min-h-screen bg-background text-foreground">
       {/* ── Nav ─────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -88,7 +122,6 @@ export default function LandingPage() {
             ))}
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <ThemeToggle />
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link href="/login">Sign in</Link>
             </Button>
@@ -222,9 +255,7 @@ export default function LandingPage() {
                       key={c.title}
                       className="hover-lift flex items-start gap-4 rounded-lg border border-border bg-card p-4"
                     >
-                      <span className="grid size-10 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
-                        <c.icon className="h-5 w-5" />
-                      </span>
+                 
                       <div>
                         <p className="font-semibold">{c.title}</p>
                         <p className="text-sm text-muted-foreground">{c.desc}</p>
@@ -266,22 +297,61 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ── Features Grid ─────────────────────────────────── */}
+        <section id="features" className="border-b border-border bg-background">
+          <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+            <div className="mb-12 text-center">
+              <h2 className="text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+                A complete platform for your <Highlight>fitness journey</Highlight>.
+              </h2>
+              <p className="mt-4 text-muted-foreground mx-auto max-w-2xl">
+                Everything you need to train, track, and adapt is built right in. No juggling multiple apps or paying for extra tools.
+              </p>
+            </div>
+            
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {platformFeatures.map((f, idx) => (
+                <div key={idx} className="hover-lift rounded-2xl border border-border bg-secondary/20 p-6 shadow-sm transition-all hover:bg-secondary/40 hover:border-primary/20 hover:shadow-md flex flex-col">
+                  <div className="mb-5 h-28 relative w-full rounded-xl bg-secondary/30 overflow-hidden">
+                    <Image src={f.svg} alt={f.title} fill className="object-contain p-4 opacity-85" />
+                  </div>
+               
+                  <h3 className="mb-2 font-display text-xl font-bold">{f.title}</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {f.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ── How it works ──────────────────────────────────── */}
         <section id="how-it-works" className="border-b border-border bg-secondary/30">
           <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
             <SectionTag label="How it works" index={2} total={3} />
             <div className="mt-10 grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-3">
-              {steps.map((s) => (
-                <div key={s.n} className="bg-card p-8">
-                  <span className="font-mono text-sm font-bold text-primary">
-                    [{s.n}]
-                  </span>
-                  <h3 className="mt-4 font-display text-xl font-bold">
-                    {s.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
-                </div>
-              ))}
+              {steps.map((s, i) => {
+                const svgs = [
+                  "/clipart/undraw_personal-training_jq54.svg",
+                  "/clipart/undraw_fitness-stats_bd09.svg",
+                  "/clipart/undraw_activity-tracker_3o6r.svg"
+                ];
+                return (
+                  <div key={s.n} className="bg-card p-8 flex flex-col h-full">
+                    <span className="font-mono text-sm font-bold text-primary mb-4 block">
+                      [{s.n}]
+                    </span>
+                    <div className="h-32 mb-6 flex items-center justify-center relative">
+                      <Image src={svgs[i]} alt={s.title} fill className="object-contain drop-shadow-sm opacity-90" />
+                    </div>
+                    <h3 className="mt-auto font-display text-xl font-bold">
+                      {s.title}
+                    </h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>

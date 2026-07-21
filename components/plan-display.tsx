@@ -8,7 +8,7 @@ import type { FitnessPlan, UserProfile } from "@/lib/types";
 import {
   DumbbellIcon,
   SaladIcon,
-  SparklesIcon,
+  ZapIcon,
   DownloadIcon,
   RefreshIcon,
   CheckIcon,
@@ -26,7 +26,7 @@ interface PlanDisplayProps {
   planId?: string | null;
   plan: FitnessPlan;
   userProfile: UserProfile;
-  onRegenerate: () => void;
+  onRegenerate: (updatedProfile?: UserProfile) => void;
   isLoading: boolean;
   onReset?: () => void;
   onSwapMeal?: (mealType: string, preference: "veg" | "non-veg") => Promise<void>;
@@ -133,13 +133,13 @@ export function PlanDisplay({
               </Button>
               <Button 
                 className="w-full md:w-auto font-bold shadow-sm" 
-                onClick={onRegenerate} 
+                onClick={() => onRegenerate()} 
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <RefreshIcon className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <SparklesIcon className="mr-2 h-4 w-4" />
+                  <ZapIcon className="mr-2 h-4 w-4" />
                 )}
                 {isLoading ? "Optimizing..." : "AI Optimize Plan"}
               </Button>
@@ -183,7 +183,7 @@ export function PlanDisplay({
       />
 
       <div className="pt-8">
-        <Accordion type="single" collapsible className="w-full space-y-4">
+        <Accordion type="single" collapsible defaultValue="diet" className="w-full space-y-4">
           <AccordionItem value="diet" className="border rounded-lg px-4 bg-card">
             <AccordionTrigger className="hover:no-underline font-display text-lg font-bold">
               <span className="flex items-center gap-2"><SaladIcon className="h-5 w-5 text-green-500" /> Diet & Nutrition Plan</span>
