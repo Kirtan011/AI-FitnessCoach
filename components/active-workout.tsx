@@ -17,6 +17,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Link from "next/link";
+import { useWorkoutStore } from "@/hooks/use-workout-store";
 
 function VideoModalContent({ exerciseName }: { exerciseName: string }) {
   const [videoId, setVideoId] = useState<string | null>(null);
@@ -85,15 +86,41 @@ interface ActiveWorkoutProps {
 
 export function ActiveWorkout({ sessionData, workoutDay, warmup, cooldown }: ActiveWorkoutProps) {
   const router = useRouter();
-  const [currentSection, setCurrentSection] = useState<"warmup" | "main" | "cooldown">(warmup.length > 0 ? "warmup" : "main");
-  const [exerciseIndex, setExerciseIndex] = useState(0);
-  const [completedSets, setCompletedSets] = useState<number[]>([]);
-  const [skippedExercises, setSkippedExercises] = useState<string[]>([]);
   
-  const [isResting, setIsResting] = useState(false);
-  const [restTimeLeft, setRestTimeLeft] = useState(0);
-  const [workoutDuration, setWorkoutDuration] = useState(0);
-  const [showSummary, setShowSummary] = useState(false);
+  const {
+    sessionData: sessionDataStore,
+    currentSection,
+    exerciseIndex,
+    completedSets,
+    skippedExercises,
+    isResting,
+    restTimeLeft,
+    workoutDuration,
+    showSummary,
+    initializeWorkout,
+    completeSet,
+    tickRest,
+    tickDuration,
+    nextExercise,
+  } = useWorkoutStore();
+
+  useEffect(() => {
+    if (!sessionDataStore || sessionDataStore.id !== sessionData.id) {
+      initializeWorkout(sessionData, warmup, workoutDay.exercises, cooldown);
+    }
+  }, [sessionData, warmup, workoutDay.exercises, cooldown, initializeWorkout, sessionDataStore]);
+
+  // Workout duration stopwatch
+  useEffect(() => {
+    const timer = setInterval(() => tickDuration(), 1000);
+    return () => clearInterval(timer);
+  }, [tickDuration]);
+
+  // Rest timer
+  useEffect(() => {
+    const timer = setInterval(() => tickRest(), 1000);
+    return () => clearInterval(timer);
+  }, [tickRest]);
 
   const activeList = 
     currentSection === "warmup" ? warmup :
@@ -110,68 +137,14 @@ export function ActiveWorkout({ sessionData, workoutDay, warmup, cooldown }: Act
 
   const progressPercentage = (currentGlobalIndex / totalExercises) * 100;
 
-  // Workout duration stopwatch
-  useEffect(() => {
-    const timer = setInterval(() => setWorkoutDuration(prev => prev + 1), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Rest timer
-  useEffect(() => {
-    let timer: any;
-    if (isResting && restTimeLeft > 0) {
-      timer = setInterval(() => setRestTimeLeft(prev => prev - 1), 1000);
-    } else if (isResting && restTimeLeft <= 0) {
-      setIsResting(false);
-    }
-    return () => clearInterval(timer);
-  }, [isResting, restTimeLeft]);
-
-  const parseRestTime = (timeStr: string) => {
-    const match = timeStr.match(/(\d+)/);
-    return match ? parseInt(match[0], 10) : 60;
-  };
-
-  const completeSet = (setIdx: number) => {
-    if (!completedSets.includes(setIdx)) {
-      setCompletedSets(prev => [...prev, setIdx]);
-      // Start rest timer if not the last set
-      if (setIdx < (currentExercise.sets || 1) - 1) {
-        setIsResting(true);
-        setRestTimeLeft(parseRestTime(currentExercise.restTime || "60s"));
-      }
-    }
-  };
-
-  const nextExercise = (skipped = false) => {
-    if (skipped) {
-      setSkippedExercises(prev => [...prev, currentExercise.name]);
-    }
-    
-    setIsResting(false);
-    setCompletedSets([]);
-
-    if (exerciseIndex < activeList.length - 1) {
-      setExerciseIndex(prev => prev + 1);
-    } else {
-      // Move to next section
-      if (currentSection === "warmup") {
-        setCurrentSection("main");
-        setExerciseIndex(0);
-      } else if (currentSection === "main" && cooldown.length > 0) {
-        setCurrentSection("cooldown");
-        setExerciseIndex(0);
-      } else {
-        // Finish workout
-        setShowSummary(true);
-      }
-    }
-  };
-
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, "0");
     const s = (seconds % 60).toString().padStart(2, "0");
     return `${m}:${s}`;
+  };
+
+  const handleCompleteSet = (idx: number) => {
+    completeSet(idx, currentExercise.restTime || "60s");
   };
 
   if (showSummary) {
@@ -327,7 +300,7 @@ export function ActiveWorkout({ sessionData, workoutDay, warmup, cooldown }: Act
                         key={idx}
                         variant={isDone ? "default" : "outline"}
                         className="w-full justify-between h-10"
-                        onClick={() => completeSet(idx)}
+                        onClick={() => handleCompleteSet(idx)}
                         disabled={isDone || (idx > 0 && !completedSets.includes(idx - 1))}
                       >
                         <span className="font-mono text-sm">Set {idx + 1}</span>

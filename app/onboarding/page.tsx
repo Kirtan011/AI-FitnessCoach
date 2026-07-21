@@ -7,10 +7,14 @@ import { UserForm } from "@/components/user-form";
 import { LoadingScreen } from "@/components/loading-screen";
 import { Header } from "@/components/header";
 import type { UserProfile } from "@/lib/types";
+import { usePlanStore } from "@/hooks/use-plan-store";
+import { useTargetMuscleStore } from "@/hooks/use-target-muscle-store";
 
 export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { setUserProfile } = usePlanStore();
+  const { setMiniPlan, setTargetMuscles } = useTargetMuscleStore();
 
   const handleFormSubmit = async (profile: UserProfile) => {
     setIsLoading(true);
@@ -25,6 +29,10 @@ export default function OnboardingPage() {
       if (!response.ok) {
         throw new Error("Failed to generate plan");
       }
+      
+      setUserProfile(profile);
+      setMiniPlan(null);
+      setTargetMuscles([]);
 
       router.push("/dashboard");
     } catch (error) {

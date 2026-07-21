@@ -1,30 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { WorkoutCalendar } from "@/components/workout-calendar";
 import { WorkoutHistory } from "@/components/workout-history";
 import { LoadingScreen } from "@/components/loading-screen";
+import { useProgressStore } from "@/hooks/use-progress-store";
 
 export default function HistoryPage() {
-  const [workoutHistory, setWorkoutHistory] = useState<any[]>([]);
+  const { workoutHistory, fetchWorkoutHistory } = useProgressStore();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchHistory() {
-      try {
-        const response = await fetch("/api/workout-history");
-        if (response.ok) {
-          const data = await response.json();
-          setWorkoutHistory(data);
-        }
-      } catch (error) {
-        console.error("Failed to load history:", error);
-      } finally {
-        setIsLoading(false);
+    async function loadHistory() {
+      if (workoutHistory.length === 0) {
+        await fetchWorkoutHistory();
       }
+      setIsLoading(false);
     }
-    fetchHistory();
-  }, []);
+    loadHistory();
+  }, [workoutHistory.length, fetchWorkoutHistory]);
 
   if (isLoading) {
     return <LoadingScreen message="Loading history..." subtitle="Dashboard" />;

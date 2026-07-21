@@ -1,40 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ProgressCharts } from "@/components/progress-charts";
 import { AnalyticsDashboard } from "@/components/analytics-dashboard";
 import { LoadingScreen } from "@/components/loading-screen";
+import { useProgressStore } from "@/hooks/use-progress-store";
 
 export default function ProgressPage() {
-  const [stats, setStats] = useState<any>(null);
-  const [workoutHistory, setWorkoutHistory] = useState<any[]>([]);
+  const { stats, workoutHistory, fetchStats, fetchWorkoutHistory } = useProgressStore();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
-      try {
-        const [statsRes, historyRes] = await Promise.all([
-          fetch("/api/stats"),
-          fetch("/api/workout-history")
-        ]);
-        
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
-          setStats(statsData);
-        }
-        
-        if (historyRes.ok) {
-          const historyData = await historyRes.json();
-          setWorkoutHistory(historyData);
-        }
-      } catch (error) {
-        console.error("Failed to load data:", error);
-      } finally {
-        setIsLoading(false);
+      // Fetch if not already loaded in store
+      const promises = [];
+      if (!stats) promises.push(fetchStats());
+      if (workoutHistory.length === 0) promises.push(fetchWorkoutHistory());
+      
+      if (promises.length > 0) {
+        await Promise.all(promises);
       }
+      setIsLoading(false);
     }
     loadData();
-  }, []);
+  }, [stats, workoutHistory.length, fetchStats, fetchWorkoutHistory]);
 
   if (isLoading) {
     return <LoadingScreen message="Analyzing your progress..." subtitle="Analytics" />;

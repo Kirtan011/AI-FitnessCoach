@@ -9,56 +9,44 @@ import { LoadingScreen } from "@/components/loading-screen";
 import { Highlight, Pill } from "@/components/shared";
 import { ArrowRightIcon, CrosshairIcon, InfoIcon, DownloadIcon, PlayCircle } from "lucide-react";
 import { RefreshIcon } from "@/components/icons";
-import { UserProfile, FitnessPlan } from "@/lib/types";
+import type { UserProfile, FitnessPlan } from "@/lib/types";
 import Image from "next/image";
 import { generateFitnessPlanPDF } from "@/lib/pdf-export";
 import { VideoModal } from "@/components/video-modal";
+import { usePlanStore } from "@/hooks/use-plan-store";
+import { useTargetMuscleStore } from "@/hooks/use-target-muscle-store";
 
 export default function TargetMusclePage() {
-  const [selected, setSelected] = useState<string[]>([]);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [miniPlan, setMiniPlan] = useState<FitnessPlan | null>(null);
-  const [isExporting, setIsExporting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isGenerating, setIsGenerating] = useState(false);
   const router = useRouter();
+  const { userProfile, fetchFitnessPlan } = usePlanStore();
+  const { 
+    miniPlan, 
+    targetMuscles, 
+    setMiniPlan, 
+    setTargetMuscles, 
+    loadTargetMuscleState 
+  } = useTargetMuscleStore();
+
+  const [isExporting, setIsExporting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const response = await fetch("/api/fitness-plan");
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.profile) {
-            setUserProfile(data.profile);
-            if (data.profile.targetMuscles) {
-              setSelected(data.profile.targetMuscles);
-            }
-          }
-        }
-        
-        // Load mini plan from localStorage
-        const savedMiniPlan = localStorage.getItem("miniPlan");
-        const savedTargetMuscles = localStorage.getItem("targetMuscles");
-        if (savedMiniPlan) {
-          setMiniPlan(JSON.parse(savedMiniPlan));
-        }
-        if (savedTargetMuscles) {
-          setSelected(JSON.parse(savedTargetMuscles));
-        }
-      } catch (error) {
-        console.error("Failed to fetch profile or load data:", error);
-      } finally {
-        setIsLoading(false);
+    async function init() {
+      loadTargetMuscleState();
+      if (!userProfile) {
+        await fetchFitnessPlan();
       }
+      setIsInitializing(false);
     }
-    fetchProfile();
-  }, []);
+    init();
+  }, [userProfile, loadTargetMuscleState, fetchFitnessPlan]);
 
   const toggleMuscle = (muscle: string) => {
-    setSelected(prev => 
-      prev.includes(muscle) ? prev.filter(m => m !== muscle) : [...prev, muscle]
-    );
+    const updated = targetMuscles.includes(muscle) 
+      ? targetMuscles.filter(m => m !== muscle) 
+      : [...targetMuscles, muscle];
+    setTargetMuscles(updated);
   };
 
   const handleGenerate = async () => {
@@ -66,7 +54,7 @@ export default function TargetMusclePage() {
     
     setIsGenerating(true);
     try {
-      const updatedProfile = { ...userProfile, targetMuscles: selected };
+      const updatedProfile = { ...userProfile, targetMuscles };
       const response = await fetch("/api/generate-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -77,10 +65,6 @@ export default function TargetMusclePage() {
 
       const planData = await response.json();
       setMiniPlan(planData);
-      
-      // Save to localStorage so it persists across navigation
-      localStorage.setItem("miniPlan", JSON.stringify(planData));
-      localStorage.setItem("targetMuscles", JSON.stringify(selected));
     } catch (error) {
       console.error("Error generating plan:", error);
       alert("Failed to generate targeted plan. Please try again.");
@@ -89,7 +73,7 @@ export default function TargetMusclePage() {
     }
   };
 
-  if (isLoading) {
+  if (isInitializing) {
     return <LoadingScreen message="Loading muscle map..." subtitle="Target Focus" />;
   }
 
@@ -127,7 +111,7 @@ export default function TargetMusclePage() {
                   <h3 className="absolute top-4 left-6 text-sm font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-primary transition-colors">Anterior (Front)</h3>
                   <MuscleSelector 
                     type="anterior" 
-                    selectedMuscles={selected} 
+                    selectedMuscles={targetMuscles} 
                     onSelectMuscle={toggleMuscle}
                     className="w-full max-w-[300px] h-[500px]"
                   />
@@ -136,7 +120,7 @@ export default function TargetMusclePage() {
                   <h3 className="absolute top-4 left-6 text-sm font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-primary transition-colors">Posterior (Back)</h3>
                   <MuscleSelector 
                     type="posterior" 
-                    selectedMuscles={selected} 
+                    selectedMuscles={targetMuscles} 
                     onSelectMuscle={toggleMuscle}
                     className="w-full max-w-[300px] h-[500px]"
                   />
@@ -154,7 +138,7 @@ export default function TargetMusclePage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="min-h-[120px] bg-secondary/30 rounded-xl p-4 border border-border/50">
-                {selected.length === 0 ? (
+                {targetMuscles.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground space-y-3 py-4">
                      <div className="relative w-20 h-20 opacity-50">
                        <Image src="/clipart/undraw_athletes-training_koqa.svg" alt="Select muscles" fill className="object-contain" />
@@ -163,7 +147,7 @@ export default function TargetMusclePage() {
                    </div>
                 ) : (
                   <div className="flex flex-wrap gap-2">
-                    {selected.map(m => (
+                    {targetMuscles.map(m => (
                       <span key={m} className="px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-full capitalize animate-in zoom-in duration-200">
                         {m.replace("-", " ")}
                       </span>
@@ -177,7 +161,7 @@ export default function TargetMusclePage() {
                   size="lg" 
                   className="w-full font-bold shadow-md h-14 text-base group" 
                   onClick={handleGenerate} 
-                  disabled={selected.length === 0 || isGenerating}
+                  disabled={targetMuscles.length === 0 || isGenerating}
                 >
                   {isGenerating ? (
                     <RefreshIcon className="mr-2 h-5 w-5 animate-spin" />
@@ -206,8 +190,7 @@ export default function TargetMusclePage() {
             <div className="flex items-center gap-3">
               <Button variant="ghost" className="font-medium text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => {
                 setMiniPlan(null);
-                localStorage.removeItem("miniPlan");
-                localStorage.removeItem("targetMuscles");
+                setTargetMuscles([]);
               }}>
                 Clear
               </Button>
@@ -232,7 +215,7 @@ export default function TargetMusclePage() {
           
           <div className="grid gap-6">
             {miniPlan.workoutPlan?.flatMap(day => day.exercises || [])
-              .filter((ex, index, self) => index === self.findIndex((e) => e.name === ex.name)) // Unique exercises
+              .filter((ex, index, self) => index === self.findIndex((e) => e.name === ex.name))
               .map((ex, idx) => (
               <Card key={idx} className="overflow-hidden border-border/50 shadow-sm animate-in fade-in duration-500" style={{ animationDelay: `${idx * 100}ms` }}>
                 <div className="flex flex-col">
@@ -253,12 +236,6 @@ export default function TargetMusclePage() {
                         )}
                       </div>
                     </div>
-                    
-                    {ex.videoUrl && (
-                      <div className="w-full sm:w-max">
-                        <VideoModal exerciseName={ex.name} />
-                      </div>
-                    )}
                     
                     <div className="space-y-4">
                       <div>
