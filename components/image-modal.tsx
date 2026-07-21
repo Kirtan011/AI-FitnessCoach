@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { XIcon, LoaderIcon, ImageIcon, SparklesIcon } from "@/components/icons";
+import { XIcon, LoaderIcon, ImageIcon, ZapIcon } from "@/components/icons";
 
 interface ImageModalProps {
   isOpen: boolean;
@@ -55,7 +55,7 @@ export function ImageModal({
                 {itemType === "exercise" ? (
                   <ImageIcon className="h-5 w-5 text-primary" />
                 ) : (
-                  <SparklesIcon className="h-5 w-5 text-primary" />
+                  <ZapIcon className="h-5 w-5 text-primary" />
                 )}
               </div>
               <div>
@@ -109,7 +109,7 @@ export function ImageModal({
           {/* Footer */}
           <div className="p-4 bg-gradient-to-r from-secondary/30 to-transparent">
             <p className="text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
-              <SparklesIcon className="h-4 w-4 text-primary" />
+              <ZapIcon className="h-4 w-4 text-primary" />
               Powered by AI Image Generation
             </p>
           </div>

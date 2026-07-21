@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { UserForm } from "@/components/user-form";
 import { LoadingScreen } from "@/components/loading-screen";
@@ -41,6 +42,13 @@ export default function OnboardingPage() {
           <LoadingScreen />
         ) : (
           <div className="mx-auto max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="mb-10 flex flex-col items-center justify-center text-center">
+              <div className="h-40 mb-6 relative w-full max-w-[320px]">
+                <Image src="/clipart/undraw_fitness-tracker_iedm.svg" alt="Fitness Tracker" fill className="object-contain opacity-90 drop-shadow-sm" />
+              </div>
+              <h1 className="text-3xl font-display font-bold">Build Your Profile</h1>
+              <p className="text-muted-foreground mt-2 max-w-md">Let's personalize your fitness plan by understanding your goals, experience, and lifestyle.</p>
+            </div>
             <UserForm onSubmit={handleFormSubmit} isLoading={isLoading} />
           </div>
         )}

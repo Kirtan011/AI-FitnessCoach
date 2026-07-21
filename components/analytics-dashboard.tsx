@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { DumbbellIcon, FlameIcon, ClockIcon, SparklesIcon, TargetIcon } from "@/components/icons";
+import { DumbbellIcon, FlameIcon, ClockIcon, ZapIcon, TargetIcon } from "@/components/icons";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, Legend
@@ -117,7 +117,7 @@ export function AnalyticsDashboard({ sessions }: AnalyticsDashboardProps) {
         <Card className="bg-secondary/20 border-primary/10">
           <CardContent className="flex items-center p-6 gap-4">
             <div className="bg-purple-500/20 p-3 rounded-xl text-purple-500">
-              <SparklesIcon className="w-6 h-6" />
+              <ZapIcon className="w-6 h-6" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Streak</p>

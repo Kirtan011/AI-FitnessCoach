@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Calendar, Home, Settings, LineChart, Plus, LogOut, ChevronUp, User2, Dumbbell, Moon, Sun, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
 import {
@@ -11,6 +11,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
@@ -29,6 +30,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "@/components/shared";
 
@@ -49,11 +55,17 @@ const navigationItems = [
     url: "/dashboard/progress",
     icon: LineChart,
   },
+  {
+    title: "Target Muscles",
+    url: "/dashboard/target-muscle",
+    icon: Dumbbell,
+  },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { data: session } = useSession();
   const { theme, setTheme } = useTheme();
   const [plans, setPlans] = useState<Array<{id: string, title: string, createdAt: string}>>([]);
@@ -63,11 +75,16 @@ export function AppSidebar() {
       fetch("/api/fitness-plans")
         .then(res => res.json())
         .then(data => {
-          if (Array.isArray(data)) setPlans(data);
+          if (Array.isArray(data)) {
+            setPlans(data);
+            if (data.length === 0) {
+              router.push("/onboarding");
+            }
+          }
         })
         .catch(console.error);
     }
-  }, [session]);
+  }, [session, router]);
 
   const urlPlanId = searchParams.get("planId");
   const [activePlanId, setActivePlanId] = useState<string | null>(urlPlanId);
@@ -137,6 +154,19 @@ export function AppSidebar() {
         {plans.length > 0 && (
           <SidebarGroup>
             <SidebarGroupLabel>Your Plans</SidebarGroupLabel>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <SidebarGroupAction asChild>
+                  <Link href="/onboarding">
+                    <Plus className="h-4 w-4" />
+                    <span className="sr-only">Create New Plan</span>
+                  </Link>
+                </SidebarGroupAction>
+              </TooltipTrigger>
+              <TooltipContent side="right" align="center">
+                Create New Plan
+              </TooltipContent>
+            </Tooltip>
             <SidebarGroupContent>
               <SidebarMenu className="gap-2">
                 {plans.map((plan, index) => {

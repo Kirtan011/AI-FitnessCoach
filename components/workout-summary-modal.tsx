@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { FlameIcon, ClockIcon, TargetIcon, SparklesIcon } from "@/components/icons";
+import { FlameIcon, ClockIcon, TargetIcon, ZapIcon } from "@/components/icons";
 
 interface WorkoutSummaryModalProps {
   sessionId: string;
@@ -74,7 +74,7 @@ export function WorkoutSummaryModal({
       <Card className="w-full max-w-lg border-primary/20 shadow-xl shadow-primary/5 animate-in fade-in zoom-in-95 mt-8 mb-8">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/10 w-16 h-16 flex items-center justify-center rounded-full mb-4">
-            <SparklesIcon className="w-8 h-8 text-primary" />
+            <ZapIcon className="w-8 h-8 text-primary" />
           </div>
           <CardTitle className="text-3xl font-display">Workout Complete!</CardTitle>
           <CardDescription>Great job! Let's log how you felt to help the AI improve your next session.</CardDescription>
