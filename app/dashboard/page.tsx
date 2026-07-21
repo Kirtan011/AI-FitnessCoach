@@ -53,21 +53,26 @@ function DashboardPageContent() {
     loadSavedPlan();
   }, [router, searchParams]);
 
-  const handleRegenerate = async () => {
-    if (userProfile) {
+  const handleRegenerate = async (updatedProfile?: UserProfile) => {
+    const profileToUse = updatedProfile || userProfile;
+    if (profileToUse) {
       setIsLoading(true);
       try {
         const response = await fetch("/api/generate-plan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ profile: userProfile, isRegenerate: true }),
+          body: JSON.stringify({ profile: profileToUse, isRegenerate: true }),
         });
 
         if (!response.ok) throw new Error("Failed to regenerate");
 
-        const planData: { id: string, plan: FitnessPlan } = await response.json();
-        setFitnessPlan(planData.plan);
+        const planData = await response.json();
+        // planData contains { id, warmup, workoutPlan, cooldown, dietPlan, motivation, tips }
+        setFitnessPlan(planData);
         setPlanId(planData.id);
+        if (updatedProfile) {
+          setUserProfile(updatedProfile);
+        }
       } catch (error) {
         console.error("Error generating plan:", error);
         alert("Failed to regenerate plan. Please try again.");

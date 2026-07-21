@@ -10,6 +10,7 @@ import { Highlight, Pill } from "@/components/shared";
 import { ArrowRightIcon, CrosshairIcon, InfoIcon, DownloadIcon, PlayCircle } from "lucide-react";
 import { RefreshIcon } from "@/components/icons";
 import { UserProfile, FitnessPlan } from "@/lib/types";
+import Image from "next/image";
 import { generateFitnessPlanPDF } from "@/lib/pdf-export";
 import { VideoModal } from "@/components/video-modal";
 
@@ -154,10 +155,12 @@ export default function TargetMusclePage() {
             <CardContent className="space-y-6">
               <div className="min-h-[120px] bg-secondary/30 rounded-xl p-4 border border-border/50">
                 {selected.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground space-y-2 opacity-60 py-4">
-                    <InfoIcon className="h-8 w-8" />
-                    <p className="text-sm">Click the interactive map to select muscles.</p>
-                  </div>
+                  <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground space-y-3 py-4">
+                     <div className="relative w-20 h-20 opacity-50">
+                       <Image src="/clipart/undraw_athletes-training_koqa.svg" alt="Select muscles" fill className="object-contain" />
+                     </div>
+                     <p className="text-sm">Click the interactive map to select muscles.</p>
+                   </div>
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {selected.map(m => (
