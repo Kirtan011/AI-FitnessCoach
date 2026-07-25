@@ -138,7 +138,20 @@ export default function LandingPage() {
         {/* ── Hero ──────────────────────────────────────────── */}
         <section className="relative overflow-hidden border-b border-border">
           <DotGrid className="opacity-70" />
-          <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-16 text-center md:pt-24">
+
+          {/* Decorative Clipart - Right */}
+          <div className="pointer-events-none absolute right-[-5%] top-16 z-0 hidden w-[300px] opacity-15 md:block lg:right-4 lg:w-[400px] xl:right-[5%]">
+            <Image
+              src="/clipart/undraw_personal-training_jq54.svg"
+              alt="AI Personal Training"
+              width={400}
+              height={400}
+              className="h-auto w-full object-contain"
+              priority
+            />
+          </div>
+
+          <div className="relative z-10 mx-auto max-w-6xl px-6 pb-20 pt-16 text-center md:pt-24">
             <div className="flex justify-center">
               <Pill tag="New">AI plans tuned to your body & schedule →</Pill>
             </div>

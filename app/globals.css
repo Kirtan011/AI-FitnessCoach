@@ -42,7 +42,7 @@
   /* Brand-specific tokens (used by shared components) */
   --brand-blue: #000000;
   --brand-blue-strong: #333333;
-  --dot-color: rgba(0, 0, 0, 0.12);
+  --dot-color: rgba(0, 0, 0, 0.35);
 }
 
 .dark {
@@ -82,7 +82,7 @@
 
   --brand-blue: #ffffff;
   --brand-blue-strong: #cccccc;
-  --dot-color: rgba(255, 255, 255, 0.15);
+  --dot-color: rgba(255, 255, 255, 0.35);
 }
 
 @theme inline {
